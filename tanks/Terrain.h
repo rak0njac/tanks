@@ -2,8 +2,9 @@
 #include <vector>
 #include <SFML/Graphics.hpp>
 
+// structure that represents
 struct Range {
-	int min;
+	int min; 
 	int max;
 	Range* next;
 };
@@ -20,8 +21,9 @@ public:
 	void destroy(sf::Vector2i pos, int radius);
 	void groundFall();
 	void groundFallThreaded(int thread);
+	Range* operator[](int);
+	Range* operator[](float);
 
-	
 	sf::VertexArray vArray;
 	std::vector<Range> ranges;
 

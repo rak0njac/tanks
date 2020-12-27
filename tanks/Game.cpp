@@ -70,6 +70,10 @@ void Game::render() {
 	for (int i = 0; i < players.size(); i++) {
 		window->draw(players[i]);
 	}
+	
+	for (Projectile* i: projectiles) {
+		window->draw(*i);
+	}
 	//window->setView(hudView);
 	window->setView(window->getDefaultView());
 	window->draw(*hud);
@@ -77,16 +81,35 @@ void Game::render() {
 }
 
 void Game::update() {
-	if (sf::Mouse::isButtonPressed(sf::Mouse::Left) && window->hasFocus() && clickClock.getElapsedTime().asSeconds() > 0.01f)
+	mousepos = sf::Mouse::getPosition(*window);
+	/*if (sf::Mouse::isButtonPressed(sf::Mouse::Left) && window->hasFocus() && clickClock.getElapsedTime().asSeconds() > 0.01f)
 	{
 		clickClock.restart();
-		sf::Vector2i position = sf::Mouse::getPosition(*window);
-		sf::Vector2f worldPos = window->mapPixelToCoords(position, gameView);
+		sf::Vector2f worldPos = window->mapPixelToCoords(mousepos, gameView);
 		terrain->destroy(sf::Vector2i(worldPos.x,worldPos.y), 20);
+	}*/
+	if (sf::Mouse::isButtonPressed(sf::Mouse::Left) && window->hasFocus() && clickClock.getElapsedTime().asSeconds() > 0.1f)
+	{
+		players[0].shoot(projectiles);
+		clickClock.restart();
 	}
 	terrain->groundFall();
 	for (int i = 0; i < players.size(); i++) {
-		players[i].move(*terrain, sf::Vector2f(0,0));
+		players[i].move(*terrain, sf::Vector2f(0,0), window->mapPixelToCoords(mousepos, gameView));
+	}
+	std::list<Projectile*>::iterator it = projectiles.begin();
+	while (it != projectiles.end()) {
+		if ((*it)->destroyed) {
+			delete (*it);
+			it = projectiles.erase(it);
+		}
+		else {
+			(*it)->move(*terrain);
+			it++;
+		}
+	}
+	for (Projectile* i: projectiles) {
+		i->move(*terrain);
 	}
 }
 

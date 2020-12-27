@@ -1,4 +1,5 @@
 #include "Player.h"
+#include <stdio.h>
 #include <cmath>
 
 const float pi = std::acos(-1);
@@ -28,12 +29,22 @@ Player::Player()
 	body.setFillColor(sf::Color::Blue);
 	body.setSize(sf::Vector2f(20,10));
 	body.setOrigin(sf::Vector2f(10, 5));
+
+	tube.setFillColor(sf::Color::Green);
+	tube.setSize(sf::Vector2f(15, 3));
+	tube.setOrigin(sf::Vector2f(0, 1.5));
+
 	collisionCircle.setRadius(6);
+
 	pos = sf::Vector2f(100, 0);
+
 	collisionCircle.setFillColor(sf::Color::Red);
+
 	body.setPosition(pos);
+	tube.setPosition(pos);
 	collisionCircle.setOrigin(sf::Vector2f(6, 6));
 	collisionCircle.setPosition(sf::Vector2f(pos.x,pos.y));
+	weapons.push_back(Weapon());
 	movementVec.y = 0.f;
 	movementVec.x = 0.f;
 
@@ -44,14 +55,41 @@ Player::~Player()
 {
 }
 
-void Player::draw(sf::RenderTarget & target, sf::RenderStates states) const
-{
-	target.draw(body, states);
-	target.draw(collisionCircle, states);
+void Player::shoot(std::list <Projectile*>& projectiles) {
+	weapons[currentWeapon].fire(tube.getPosition() , tube.getRotation(), projectiles);
 }
 
-void Player::move(const Terrain & terrain, sf::Vector2f mv)
+void Player::add_wep(Weapon wep)
 {
+	weapons.push_back(wep);
+}
+
+void Player::change_wep(int i)
+{
+	currentWeapon += i % weapons.capacity();
+}
+
+void Player::change_wep_abs(int i)
+{
+	currentWeapon = i%weapons.capacity();
+}
+
+void Player::draw(sf::RenderTarget & target, sf::RenderStates states) const
+{
+	target.draw(tube, states);
+	target.draw(body, states);
+	target.draw(collisionCircle, states);
+	
+}
+
+void Player::move(const Terrain & terrain, sf::Vector2f mv, const sf::Vector2f &mousepos)
+{
+	float tube_angle = atan2(mousepos.y - pos.y, mousepos.x - pos.x);
+	tube_angle *= 180 / pi;
+	tube.setRotation(tube_angle);
+	//tube.rotate(tube_angle);
+	
+
 #if 0
 	int tocheck = static_cast<int>(roundf(pos.x));
 	if (tocheck > 0 && tocheck < 800) {
@@ -127,7 +165,6 @@ void Player::move(const Terrain & terrain, sf::Vector2f mv)
 	collisionCircle.setPosition(pos);
 	body.setPosition(pos);
 #endif
-
 #if 1
 	int circX = collisionCircle.getPosition().x;
 	int circY = 600 - (collisionCircle.getPosition().y) - collisionCircle.getRadius();
@@ -174,7 +211,7 @@ void Player::move(const Terrain & terrain, sf::Vector2f mv)
 				float diff = (std::atan(current->max - currentY) * 180 / pi) / 90;
 				movementVec.x += moveSpeed * (1 - diff);
 				movementVec.y -= moveSpeed * diff;
-				rotation = current->max - currentY;
+				rotation = diff*90;
 			}
 		}
 		else if (movingLeft) {
@@ -193,13 +230,110 @@ void Player::move(const Terrain & terrain, sf::Vector2f mv)
 				float diff = (std::atan(current->max - currentY) * 180 / pi) / 90;
 				movementVec.x -= moveSpeed * (1 - diff);
 				movementVec.y -= moveSpeed * diff;
-				rotation = current->max - currentY;
+				rotation = -diff*90;
 			}
 		}
 	}
 	pos += movementVec;
 	collisionCircle.setPosition(pos);
 	body.setPosition(pos);
-	body.setRotation(rotation);
+	tube.setPosition(pos);
+	//body.setRotation(rotation);
+#endif
+#if 0
+	float circX = collisionCircle.getPosition().x;
+	float circY = 600 - (collisionCircle.getPosition().y) - collisionCircle.getRadius();
+	int hX = ceil(circX);
+	int lX = floor(circX);
+	int hY = ceil(circY);
+	int lY = floor(circY);
+	if (circX > 799) {
+		circX = 799;
+	}
+	if (circX < 0) {
+		circX = 0;
+	}
+	const Range* currentLower = &terrain.ranges[lX];
+	const Range* currentHigher = &terrain.ranges[hX];
+	movementVec *= 0.f;
+	while (currentLower->next) currentLower = currentLower->next;
+	while (currentHigher->next) currentHigher = currentHigher->next;
+	float midpos = (currentLower->max + currentHigher->max) / 2.f;
+	if (circY > midpos) {
+		falling = true;
+		movementVec.y += fallSpeed;
+	}
+	else {
+		falling = false;
+	}
+
+	float diff =atan(fmod(midpos,1.01)) *180/pi/70;
+	float toMove = midpos + moveSpeed;
+	int toMoveHigher = ceil(toMove);
+	int toMoveLower = floor(toMove);
+	//const Range* current;
+	if (!falling) {
+		if (movingRight) {
+			if (toMove >= 795) {
+				movementVec *= 0.f;
+			}
+			else if (currentHigher->max - midpos > 4) {
+				movementVec *= 0.f;
+			}
+			else {
+				movementVec.x += moveSpeed * (1-diff);
+				movementVec.y -= moveSpeed * diff;
+				//rotation = current->max - currentY;
+			}
+		}
+		else if (movingLeft) {
+			if (toMove <= 5)
+				movementVec *= 0.f;
+			else if (currentLower->max - midpos > 4) {
+				movementVec *= 0.f;
+			}
+			else {
+				movementVec.x -= moveSpeed * (1-diff);
+				movementVec.y -= moveSpeed * diff;
+				//rotation = current->max - currentY;
+			}
+		}
+		//collision handling
+		int steps = floor(moveSpeed);
+		int nX = hX + 1;
+		const Range* nextHigher = &terrain.ranges[nX];
+		const Range* nextLower = currentHigher;
+		/*while (steps > 0) {
+			float diffNext = atan(fmod((nextHigher->max+nextLower->max)/2, 1.01)) * 180 / pi / 90;;
+			if (diffNext > diff) {
+				diff = diffNext;
+			}
+			if (movingLeft)
+			{
+				movementVec.x -=  (1 - diff);
+				movementVec.y -=  diff;
+			}
+			else if(movingRight)
+			{
+				movementVec.x +=(1 - diff);
+				movementVec.y -=  diff;
+			}
+			currentHigher = nextHigher;
+			nextLower = currentHigher;
+			currentLower = nextLower;
+			nX++;
+			steps--;
+			nextHigher = &terrain.ranges[nX];
+
+		}*/
+		
+	}
+
+	pos += movementVec;
+	collisionCircle.setPosition(pos);
+	body.setPosition(pos);
+	//body.setRotation(rotation);
+#endif
+#if 0
 #endif
 }

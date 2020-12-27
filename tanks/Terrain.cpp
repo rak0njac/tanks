@@ -85,7 +85,7 @@ Terrain::Terrain(const std::string & file) // file = image file for the texture
 
 }
 
-void Terrain::destroy(sf::Vector2i pos, int radius) { //destroys ground in a circle at the given position with the given radius
+void Terrain::destroy(sf::Vector2i pos, int radius) { //destroys ground in a circle at the given position with the given radius, currently only for debugging
 	//int quadPos = pos.x + pos.y * screenWidth;
 	//radius /= xSize * ySize;
 	pos.x /= xSize;
@@ -255,6 +255,18 @@ void Terrain::groundFallThreaded(int thread) {//makes each row of ground fall do
 			current = next;
 		}
 	}
+}
+
+Range * Terrain::operator[](int i)
+{
+	if (i < 0 || i >= width)
+		return nullptr;
+	return &ranges[i];
+}
+
+Range * Terrain::operator[](float i)
+{
+	return (*this)[static_cast<int>(round(i))];
 }
 
 

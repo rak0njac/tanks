@@ -1,0 +1,16 @@
+-delete inactive projectiles
+
+-fix projectile collision(break down higher speed projectile movement into steps)
+
+-improve player collision
+
+-fix terrain generation sometimes crashing
+
+-refactor the code that updates objects within the game
+
+-create weapons on game start from a config/script txt file
+
+-create 2nd player/ai
+
+-create a resource class -> manage resources from there
+
