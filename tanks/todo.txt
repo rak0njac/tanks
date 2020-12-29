@@ -1,6 +1,4 @@
--delete inactive projectiles
-
--fix projectile collision(break down higher speed projectile movement into steps)
+-more work on projectile collision
 
 -improve player collision
 
@@ -11,6 +9,8 @@
 -create weapons on game start from a config/script txt file
 
 -create 2nd player/ai
+
+-separate collision detection and movement
 
 -create a resource class -> manage resources from there
 

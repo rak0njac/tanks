@@ -25,6 +25,8 @@ Weapon::~Weapon()
 }
 
 void Weapon::fire(sf::Vector2f pos, float angle,  std::list<Projectile*>& projectiles) {
+	if (last_fired.getElapsedTime().asSeconds() < cooldown) return;
+	last_fired.restart();
 	switch (type) {
 	case WeaponType::STANDARD: fire_standard(pos, angle, projectiles); break;
 
@@ -34,7 +36,9 @@ void Weapon::fire_standard(sf::Vector2f pos, float angle, std::list<Projectile*>
 	sf::Vector2f ppos;
 	ppos.x = pos.x + spawn_offset * (cos(angle * pi / 180));
 	ppos.y = pos.y + spawn_offset * (sin(angle * pi / 180));
-	Projectile* proj = new Projectile(ppos, angle, speed, expl_size);
+	Projectile* proj = new Projectile(ppos, angle, speed, expl_size, proj_rad);
+	proj->drop_rate = drop_rate;
+	proj->drop_max = drop_max;
 	projectiles.push_back(proj);
 }
 

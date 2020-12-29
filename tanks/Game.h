@@ -5,6 +5,7 @@
 #include "HUD.h"
 #include "Projectile.h"
 #include <list>
+#include "GameResourceManager.h"
 
 class Game
 {
@@ -16,17 +17,22 @@ public:
 	void pool();
 	void render();
 	void update();
+	void init_weapons();
 	void handlePress(sf::Keyboard::Key key, bool pressed);
+	void handleMousePress(sf::Mouse::Button button, bool pressed);
+
+	void handleMouseWheel(int scrolled);
 	
 
 private:
+	GameResourceManager grm;
 	sf::RenderWindow *window;
 	sf::View gameView;
 	sf::View hudView;
 	Terrain* terrain;
 	HUD* hud;
 	sf::Vector2i mousepos;
-	std::list<Projectile*> projectiles;
+	
 
 
 

@@ -2,7 +2,7 @@
 #include <math.h>
 #include "Terrain.h"
 const float pi = std::acos(-1);
-
+const float frame = 1.f / 60.f;
 
 Projectile::Projectile()
 {
@@ -12,7 +12,6 @@ Projectile::Projectile()
 Projectile::Projectile(sf::Vector2f p, float angle, float sp, float explr)
 {
 	speed = sp;
-	gravity_factor = 1;
 	shape = new sf::CircleShape();
 	shape->setFillColor(sf::Color::Magenta);
 	proj_rad = 4;
@@ -21,7 +20,34 @@ Projectile::Projectile(sf::Vector2f p, float angle, float sp, float explr)
 	shape->setPosition(p);
 	shape->setRotation(angle);
 	cur_angle = angle;
+	init_angle = angle;
 	expl_rad = explr;
+	movementVector.x = speed * (cos(cur_angle * pi / 180));
+	movementVector.y = speed * (sin(cur_angle * pi / 180));
+	//time.restart();
+
+}
+
+Projectile::Projectile(sf::Vector2f p, float angle, float sp, float explr, float rad)
+{
+	speed = sp;
+	shape = new sf::CircleShape();
+	shape->setFillColor(sf::Color::Magenta);
+	proj_rad = rad;
+	static_cast<sf::CircleShape*>(shape)->setRadius(proj_rad);
+	static_cast<sf::CircleShape*>(shape)->setOrigin(proj_rad / 2, proj_rad / 2);
+	shape->setPosition(p);
+	shape->setRotation(angle);
+	cur_angle = angle;
+	init_angle = angle;
+	init_pos = p;
+	expl_rad = explr;
+	movementVector.x = speed * (cos(cur_angle * pi / 180));
+	movementVector.y = speed * (sin(cur_angle * pi / 180));
+	
+
+	//test
+	//time.restart();
 }
 
 Projectile::~Projectile()
@@ -38,11 +64,17 @@ void Projectile::move(Terrain & terrain) {
 	if (destroyed) return;
 	sf::Vector2f npos;
 	sf::Vector2f cpos = shape->getPosition();
-	npos.x = cpos.x + speed * (cos(cur_angle * pi / 180));
-	npos.y = cpos.y + speed * (sin(cur_angle * pi / 180));
-	shape->setPosition(npos);
 
-	/*if (cpos.x >= 0 && cpos.x < 800) {
+	npos.x = cpos.x + movementVector.x;
+	npos.y = cpos.y + movementVector.y;
+	
+	//npos.x = cpos.x + speed * (cos(cur_angle * pi / 180));
+	//npos.y = cpos.y + speed * (sin(cur_angle * pi / 180));
+	shape->setPosition(npos);
+	movementVector.y += drop_rate * frame;
+	cur_angle = atan2(movementVector.y, movementVector.x) * 180/pi;
+	shape->setRotation(cur_angle);
+	/*if (cpos.x >aa < 800) {
 		const Range* cur = &terrain.ranges[cpos.x];
 		while (cur) {
 			if (600 - cpos.y >=  cur->min && 600 - cpos.y <= cur->max) {
@@ -73,7 +105,7 @@ void Projectile::move(Terrain & terrain) {
 		cpos.x = cpos.x + 1 * (cos(cur_angle * pi / 180));
 		cpos.y = cpos.y + 1 * (sin(cur_angle * pi / 180));
 	}
-	if (npos.x < 0 || npos.x >= 800 || npos.y <0 || npos.y>=600 ) {
+	if (npos.x < 0 || npos.x >= 800 || npos.y <-2000 || npos.y>=600 ) {
 		destroyed = true;
 	}
 	//cur_angle -= 10;

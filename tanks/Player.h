@@ -3,6 +3,7 @@
 #include "Terrain.h"
 #include "Weapon.h"
 #include <list>
+#include "GameResourceManager.h"
 class Game;
 const float fallSpeed = 2.f;
 const float moveSpeed = 1.f;
@@ -17,8 +18,13 @@ public:
 	void change_wep(int);
 	void change_wep_abs(int);
 	void move(const Terrain& terrain, sf::Vector2f mv,const sf::Vector2f &mousepos);
+
+	void update(const Terrain& terrain, sf::Vector2f mv, const sf::Vector2f &mousepos,
+		GameResourceManager& grm);
+
 	bool movingLeft = false;
 	bool movingRight = false;
+	bool firing = false;
 private:
 	sf::RectangleShape body;
 	sf::RectangleShape tube;

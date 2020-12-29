@@ -44,7 +44,6 @@ Player::Player()
 	tube.setPosition(pos);
 	collisionCircle.setOrigin(sf::Vector2f(6, 6));
 	collisionCircle.setPosition(sf::Vector2f(pos.x,pos.y));
-	weapons.push_back(Weapon());
 	movementVec.y = 0.f;
 	movementVec.x = 0.f;
 
@@ -56,22 +55,26 @@ Player::~Player()
 }
 
 void Player::shoot(std::list <Projectile*>& projectiles) {
+	if (weapons.size() <= 0) return;
 	weapons[currentWeapon].fire(tube.getPosition() , tube.getRotation(), projectiles);
 }
 
 void Player::add_wep(Weapon wep)
 {
 	weapons.push_back(wep);
+	
 }
 
 void Player::change_wep(int i)
 {
-	currentWeapon += i % weapons.capacity();
+	currentWeapon += i;
+	if (currentWeapon < 0) currentWeapon = weapons.size() - 1;
+	else currentWeapon %= weapons.size();
 }
 
 void Player::change_wep_abs(int i)
 {
-	currentWeapon = i%weapons.capacity();
+	currentWeapon = i % weapons.size();
 }
 
 void Player::draw(sf::RenderTarget & target, sf::RenderStates states) const
@@ -80,6 +83,17 @@ void Player::draw(sf::RenderTarget & target, sf::RenderStates states) const
 	target.draw(body, states);
 	target.draw(collisionCircle, states);
 	
+}
+
+void Player::update(
+	const Terrain & terrain,
+	sf::Vector2f mv,
+	const sf::Vector2f & mousepos,
+	GameResourceManager& grm)
+{
+	if (firing) shoot(grm.projectiles);
+
+	move(terrain, mv, mousepos);
 }
 
 void Player::move(const Terrain & terrain, sf::Vector2f mv, const sf::Vector2f &mousepos)
@@ -176,6 +190,7 @@ void Player::move(const Terrain & terrain, sf::Vector2f mv, const sf::Vector2f &
 	}
 	const Range* current = &terrain.ranges[circX];
 	movementVec *= 0.f;
+	float ang = rotation;
 	int currentY;
 	while (current) {
 		if (circY > current->max && !current->next) {
@@ -211,7 +226,7 @@ void Player::move(const Terrain & terrain, sf::Vector2f mv, const sf::Vector2f &
 				float diff = (std::atan(current->max - currentY) * 180 / pi) / 90;
 				movementVec.x += moveSpeed * (1 - diff);
 				movementVec.y -= moveSpeed * diff;
-				rotation = diff*90;
+				ang  = -45*diff;
 			}
 		}
 		else if (movingLeft) {
@@ -230,13 +245,15 @@ void Player::move(const Terrain & terrain, sf::Vector2f mv, const sf::Vector2f &
 				float diff = (std::atan(current->max - currentY) * 180 / pi) / 90;
 				movementVec.x -= moveSpeed * (1 - diff);
 				movementVec.y -= moveSpeed * diff;
-				rotation = -diff*90;
+				ang = 45 * diff;
 			}
 		}
 	}
+	rotation = ang;
 	pos += movementVec;
 	collisionCircle.setPosition(pos);
 	body.setPosition(pos);
+	body.setRotation(ang);
 	tube.setPosition(pos);
 	//body.setRotation(rotation);
 #endif
@@ -337,3 +354,5 @@ void Player::move(const Terrain & terrain, sf::Vector2f mv, const sf::Vector2f &
 #if 0
 #endif
 }
+
+

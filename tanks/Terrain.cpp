@@ -176,7 +176,7 @@ void Terrain::displacement(float displace, float roughness) { //1D midpoint disp
 void Terrain::applyRange() { //makes pixels that aren't in the current range transparent
 	for (int i = 0; i < ranges.size(); i++) {
 		for (int j = ranges[i].max; j <= height; j++) {
-			int y = height - j;
+			int y = height - (j-1);
 			vArray[(i + y * width)].color.a = 0;
 		}
 	}
