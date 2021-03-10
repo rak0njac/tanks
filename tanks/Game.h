@@ -6,7 +6,7 @@
 #include "Projectile.h"
 #include <list>
 #include "GameResourceManager.h"
-
+#include "Parser.h"
 class Game
 {
 public:
@@ -32,6 +32,7 @@ private:
 	Terrain* terrain;
 	HUD* hud;
 	sf::Vector2i mousepos;
+	std::vector<Weapon> all_weapons;
 	
 
 

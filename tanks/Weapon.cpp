@@ -20,6 +20,17 @@ Weapon::Weapon(WeaponType t, float expls, float cd, float sp)
 	speed = sp;
 }
 
+Weapon::Weapon(std::string n, WeaponType t, float expls, float cd, float sp, float pr_rad, float dr_rate)
+{
+	name = n;
+	type = t;
+	expl_size = expls;
+	cooldown = cd;
+	speed = sp;
+	proj_rad = pr_rad;
+	drop_rate = dr_rate;
+}
+
 Weapon::~Weapon()
 {
 }

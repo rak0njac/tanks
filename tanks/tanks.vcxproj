@@ -127,6 +127,7 @@
     <ClCompile Include="GameResourceManager.cpp" />
     <ClCompile Include="HUD.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="Parser.cpp" />
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="Projectile.cpp" />
     <ClCompile Include="Random.cpp" />
@@ -137,6 +138,7 @@
     <ClInclude Include="Game.h" />
     <ClInclude Include="GameResourceManager.h" />
     <ClInclude Include="HUD.h" />
+    <ClInclude Include="Parser.h" />
     <ClInclude Include="Player.h" />
     <ClInclude Include="Projectile.h" />
     <ClInclude Include="Random.h" />

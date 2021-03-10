@@ -1,0 +1,25 @@
+Machine Gun:STANDARD
+{
+	speed:5
+	expl_size:4
+	cooldown:0.3
+	proj_rad : 3
+
+}
+
+
+Big Gun:STANDARD
+{
+	speed:5
+	expl_size:40
+	cooldown:0.3
+	proj_rad : 10
+}
+
+LAZORGUN:STANDARD
+{
+	speed:5
+	expl_size:6
+	cooldown:0.01
+	proj_rad : 3
+}

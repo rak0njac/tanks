@@ -2,7 +2,7 @@
 #include <math.h>
 #include "Terrain.h"
 const float pi = std::acos(-1);
-const float frame = 1.f / 60.f;
+constexpr float frame = 1.f / 60.f;
 
 Projectile::Projectile()
 {
@@ -89,7 +89,8 @@ void Projectile::move(Terrain & terrain) {
 		}
 	}*/
 	//int fac = cpos.x > npos.x ? -1 : 1;
-	for(int i = 0; i<(speed+ static_cast<sf::CircleShape*>(shape)->getRadius())&& !destroyed;i++) {
+	//float step = 1;
+	for(int i = 0; i<=(speed+ static_cast<sf::CircleShape*>(shape)->getRadius())&& !destroyed;i++) {
 		Range* cur = terrain[cpos.x];
 		while (cur) {
 			if (600 - (cpos.y) >= cur->min && 600 - (cpos.y) <= cur->max) {
@@ -101,10 +102,23 @@ void Projectile::move(Terrain & terrain) {
 			}
 			cur = cur->next;
 		}
-
-		cpos.x = cpos.x + 1 * (cos(cur_angle * pi / 180));
-		cpos.y = cpos.y + 1 * (sin(cur_angle * pi / 180));
+		cpos.x = cpos.x + 1.0 * (cos(cur_angle * pi / 180.0f));
+		cpos.y = cpos.y + 1.0 * (sin(cur_angle * pi / 180.0f));
 	}
+
+	//use this and make it more accurate
+	/*float cx = cpos.x - (proj_rad / 2) * (cos(cur_angle * pi / 180.0f));
+	float cy = cpos.y - (proj_rad / 2) * (sin(cur_angle * pi / 180.0f));
+	
+	int step = movementVector.x > 0 ? 1 : -1;
+	for (int i = cx; i < 800 && i>0 && !destroyed; i += step) {
+		Range* cur = terrain[cx];
+		while (cur) {
+
+			cur = cur->next;
+		}
+	}*/
+
 	if (npos.x < 0 || npos.x >= 800 || npos.y <-2000 || npos.y>=600 ) {
 		destroyed = true;
 	}

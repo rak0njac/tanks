@@ -13,8 +13,12 @@ Game::Game()
 	gameView.setViewport(sf::FloatRect(0.f, 0.f, 1, 0.75f));
 
 	grm.players.push_back(new Player());
+	all_weapons = Parser::parse("weapons.txt");
+	for (int i = 0; i < all_weapons.size(); i++) {
+		grm.players[0]->add_wep(all_weapons[i]);
+	}
 	//grm.players[0].add_wep(Weapon());
-	init_weapons();
+	//init_weapons();
 	//players.push_back(Player());
 	/*hudView.setSize(sf::Vector2f(800, 150));
 	hudView.setCenter(400, 1000);
