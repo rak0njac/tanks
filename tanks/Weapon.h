@@ -5,7 +5,8 @@
 class Game;
 class Projectile;
 enum class WeaponType {
-	STANDARD
+	STANDARD,
+	LAZOR
 };
 class Weapon
 {
@@ -32,6 +33,6 @@ private:
 	sf::Clock last_fired;
 
 	void fire_standard(sf::Vector2f pos, float angle,  std::list<Projectile*>& projectiles);
-
+	void fire_lazor(sf::Vector2f pos, float angle, std::list<Projectile*>& projectiles);
 };
 

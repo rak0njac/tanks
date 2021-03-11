@@ -1,7 +1,7 @@
 Machine Gun:STANDARD
 {
 	speed:5
-	expl_size:4
+	expl_size:10
 	cooldown:0.3
 	proj_rad : 3
 
@@ -19,7 +19,23 @@ Big Gun:STANDARD
 LAZORGUN:STANDARD
 {
 	speed:5
+	expl_size:10
+	cooldown:0.01
+	proj_rad : 3
+}
+
+LAZOR:LAZOR
+{
+	speed:5
 	expl_size:6
 	cooldown:0.01
 	proj_rad : 3
+}
+
+LAZxR:LAZOR
+{
+	speed:5
+	expl_size:6
+	cooldown:0.00
+	proj_rad : 10
 }

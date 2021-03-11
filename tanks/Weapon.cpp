@@ -40,19 +40,27 @@ void Weapon::fire(sf::Vector2f pos, float angle,  std::list<Projectile*>& projec
 	last_fired.restart();
 	switch (type) {
 	case WeaponType::STANDARD: fire_standard(pos, angle, projectiles); break;
-
+	case WeaponType::LAZOR: fire_lazor(pos, angle, projectiles); break;
 	}
 }
 void Weapon::fire_standard(sf::Vector2f pos, float angle, std::list<Projectile*>& projectiles) {
 	sf::Vector2f ppos;
 	ppos.x = pos.x + spawn_offset * (cos(angle * pi / 180));
 	ppos.y = pos.y + spawn_offset * (sin(angle * pi / 180));
-	Projectile* proj = new Projectile(ppos, angle, speed, expl_size, proj_rad);
+	Projectile* proj = new Projectile(Projectile_type::Circ, ppos, angle, speed, expl_size, proj_rad);
 	proj->drop_rate = drop_rate;
 	proj->drop_max = drop_max;
 	projectiles.push_back(proj);
 }
+void Weapon::fire_lazor(sf::Vector2f pos, float angle, std::list<Projectile*>& projectiles) {
+	sf::Vector2f ppos;
+	ppos.x = pos.x + spawn_offset * (cos(angle * pi / 180));
+	ppos.y = pos.y + spawn_offset * (sin(angle * pi / 180));
+	Projectile* proj = new Projectile(Projectile_type::LAZOR, ppos, angle, speed, expl_size, proj_rad);
 
+	//printf("firing at angle: %f\n", angle);
+	projectiles.push_back(proj);
+}
 void Weapon::clean() {
 
 }

@@ -41,17 +41,23 @@ std::vector<Weapon> Parser::parse(std::string file)
 			while (stream.peek() <= 40) stream.get();
 			cget = stream.get();
 			while (cget != '{') {
+
 				if (cget >= 141 && cget <= 172)
 				{
 					cget -= 'A' - 'a';
 				}
 				buf.push_back(cget);
 				readchars++;
+				while (stream.peek() <= 40) stream.get();
 				cget = stream.get();
 			}
 			readchars = 0;
+			printf("%s\n", buf.c_str());
 			if (buf == "STANDARD") {
 				type = WeaponType::STANDARD;
+			}
+			else if (buf == "LAZOR") {
+				type = WeaponType::LAZOR;
 			}
 		}
 		printf("4\n");

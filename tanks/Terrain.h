@@ -17,6 +17,7 @@ public:
 	Terrain();
 	~Terrain();
 	Terrain(const std::string& file);
+	void rayDestroy(sf::Vector2f origin, float angle,float thickness);
 	virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const;
 	void destroy(sf::Vector2i pos, int radius);
 	void groundFall();

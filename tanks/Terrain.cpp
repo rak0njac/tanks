@@ -14,9 +14,14 @@ const int height = 600;
 
 const float xSize = screenWidth/width;
 const float ySize = screenHeight / height;
+const float pi = std::acos(-1);
 
 
-
+float flatten(float min, float max, float value) {
+	if (value < min)return min;
+	if (value > max)return max;
+	return value;
+}
 struct midpoint {
 	int left;
 	int right;
@@ -84,8 +89,199 @@ Terrain::Terrain(const std::string & file) // file = image file for the texture
 	applyRange();
 
 }
+void Terrain::rayDestroy(sf::Vector2f origin, float angle,float thickness) {
+	
+	
+	//for testing
+	/*
+	sf::Vector2f cline(0.f, 400.f);
+	while (cline.y >= 0 && cline.y < height && cline.x >=0 && cline.x < width) {
+		
+		int x = flatten(0,height*width-1,cline.x + round(cline.y) * width);
+		sf::Vertex* point = &vArray[x];
+		if (point->color.a != 0) {
+			hasFalling = true;
+			point->color.a = 0;
+			Range* current = &ranges[flatten(0, width - 1, cline.x)];
+			while (true) {
+				Range* next = current->next;
+				int hight = height - 1 - rint(cline.y);
+				if (hight < current->max && hight > current->min) {
+					int temp = current->max;
+					current->max = hight - 1;
+					Range* insert = new Range();
+					insert->min = hight + 1;
+					insert->max = temp;
+					insert->next = current->next;
+					current->next = insert;
+					break;
+				}
+				if (hight == current->max) {
+					current->max--;
+					break;
+				}
+				if (hight == current->min && hight != 0) {
+					current->min--;
+					break;
+				}
+				if (!next) {
+					break;
+				}
+				current = next;
+			}
+		}
+		cline.x += 1;
+		cline.y += 0.5;
 
-void Terrain::destroy(sf::Vector2i pos, int radius) { //destroys ground in a circle at the given position with the given radius, currently only for debugging
+	}*/
+
+	sf::Vector2f cline = origin;
+	float aup = angle + 90;
+	float adown = angle - 90;
+
+	for (int i = 0; i < round(thickness/2); i++) {
+		cline.x = origin.x+1*i * cos(aup*pi / 180);
+		cline.y = origin.y+1*i * sin(aup*pi / 180);
+		while (cline.y >= 0 && cline.y < height && cline.x >= 0 && cline.x < width) {
+
+			int x = cline.x + round(cline.y)*(width);
+			//printf("%d\n", x);
+
+			x = flatten(0, height*width - 1, x);
+			sf::Vertex* point = &vArray[x];
+			if (point->color.a != 0) {
+				hasFalling = true;
+				point->color.a = 0;
+
+				Range* current = &ranges[flatten(0, width - 1, cline.x)];
+				while (true) {
+					Range* next = current->next;
+					int hight = height - 1 - rint(cline.y);
+					if (hight < current->max && hight > current->min) {
+						int temp = current->max;
+						current->max = hight - 1;
+						Range* insert = new Range();
+						insert->min = hight + 1;
+						insert->max = temp;
+						insert->next = current->next;
+						current->next = insert;
+						break;
+					}
+					if (hight == current->max) {
+						current->max--;
+						break;
+					}
+					if (hight == current->min && hight != 0) {
+						current->min--;
+						break;
+					}
+					if (!next) {
+						break;
+					}
+					current = next;
+				}
+			}
+			cline.x += 1 * cos(angle*pi / 180);
+			cline.y += 1 * sin(angle*pi / 180);
+			//cline.x += cline.x + 1.0;
+			//cline.y += cline.y + 1.0;
+		}
+	}
+	for (int i = 0; i < round(thickness / 2); i++) {
+		cline.x = origin.x + 1 * i * cos(adown*pi / 180);
+		cline.y = origin.y + 1 * i * sin(adown*pi / 180);
+		while (cline.y >= 0 && cline.y < height && cline.x >= 0 && cline.x < width) {
+
+			int x = cline.x + round(cline.y)*(width);
+			//printf("%d\n", x);
+
+			x = flatten(0, height*width - 1, x);
+			sf::Vertex* point = &vArray[x];
+			if (point->color.a != 0) {
+				hasFalling = true;
+				point->color.a = 0;
+
+				Range* current = &ranges[flatten(0, width - 1, cline.x)];
+				while (true) {
+					Range* next = current->next;
+					int hight = height - 1 - rint(cline.y);
+					if (hight < current->max && hight > current->min) {
+						int temp = current->max;
+						current->max = hight - 1;
+						Range* insert = new Range();
+						insert->min = hight + 1;
+						insert->max = temp;
+						insert->next = current->next;
+						current->next = insert;
+						break;
+					}
+					if (hight == current->max) {
+						current->max--;
+						break;
+					}
+					if (hight == current->min && hight != 0) {
+						current->min--;
+						break;
+					}
+					if (!next) {
+						break;
+					}
+					current = next;
+				}
+			}
+			cline.x += 1 * cos(angle*pi / 180);
+			cline.y += 1 * sin(angle*pi / 180);
+			//cline.x += cline.x + 1.0;
+			//cline.y += cline.y + 1.0;
+		}
+	}
+	/*while (cline.y >= 0 && cline.y < height && cline.x >= 0 && cline.x < width) {
+
+		int x = cline.x + round(cline.y)*(width);
+		//printf("%d\n", x);
+
+		x = flatten(0, height*width - 1, x);
+		sf::Vertex* point = &vArray[x];
+		if (point->color.a != 0) {
+			hasFalling = true;
+			point->color.a = 0;
+
+			Range* current = &ranges[flatten(0, width - 1, cline.x)];
+			while (true) {
+				Range* next = current->next;
+				int hight = height - 1 - rint(cline.y);
+				if (hight < current->max && hight > current->min) {
+					int temp = current->max;
+					current->max = hight - 1;
+					Range* insert = new Range();
+					insert->min = hight + 1;
+					insert->max = temp;
+					insert->next = current->next;
+					current->next = insert;
+					break;
+				}
+				if (hight == current->max) {
+					current->max--;
+					break;
+				}
+				if (hight == current->min && hight != 0) {
+					current->min--;
+					break;
+				}
+				if (!next) {
+					break;
+				}
+				current = next;
+			}
+		}
+		cline.x += 1 * cos(angle*pi / 180);
+		cline.y += 1 * sin(angle*pi / 180);
+		//cline.x += cline.x + 1.0;
+		//cline.y += cline.y + 1.0;
+	}*/
+	
+}
+void Terrain::destroy(sf::Vector2i pos, int radius) { 
 	//int quadPos = pos.x + pos.y * screenWidth;
 	//radius /= xSize * ySize;
 	pos.x /= xSize;
@@ -135,8 +331,7 @@ void Terrain::destroy(sf::Vector2i pos, int radius) { //destroys ground in a cir
 	hasFalling = true;
 }
 
-void Terrain::displacement(float displace, float roughness) { //1D midpoint displacement for generating random terrain
-	//TODO: NEEDS TO BE FIXED, CRASHES ONCE IN A BLUE MOON
+void Terrain::displacement(float displace, float roughness) { 
 	ranges[0].max = rng::getRangeInt(100,500);
 	ranges[width-1].max = rng::getRangeInt(100, 500);
 	std::queue<midpoint> q;

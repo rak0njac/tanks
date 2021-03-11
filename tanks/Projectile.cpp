@@ -28,23 +28,39 @@ Projectile::Projectile(sf::Vector2f p, float angle, float sp, float explr)
 
 }
 
-Projectile::Projectile(sf::Vector2f p, float angle, float sp, float explr, float rad)
+Projectile::Projectile(Projectile_type t, sf::Vector2f p, float angle, float sp, float explr, float rad)
 {
-	speed = sp;
-	shape = new sf::CircleShape();
-	shape->setFillColor(sf::Color::Magenta);
-	proj_rad = rad;
-	static_cast<sf::CircleShape*>(shape)->setRadius(proj_rad);
-	static_cast<sf::CircleShape*>(shape)->setOrigin(proj_rad / 2, proj_rad / 2);
-	shape->setPosition(p);
-	shape->setRotation(angle);
-	cur_angle = angle;
-	init_angle = angle;
-	init_pos = p;
-	expl_rad = explr;
-	movementVector.x = speed * (cos(cur_angle * pi / 180));
-	movementVector.y = speed * (sin(cur_angle * pi / 180));
-	
+	type = t;
+	if (type == Projectile_type::LAZOR) {
+		speed = sp;
+		shape = new sf::RectangleShape();
+		shape->setFillColor(sf::Color::Red);
+		static_cast<sf::RectangleShape*>(shape)->setSize(sf::Vector2f(1000,rad));
+		//static_cast<sf::RectangleShape*>(shape)->setOrigin(proj_rad / 2, proj_rad/2 );
+		shape->setPosition(p);
+		shape->setRotation(angle);
+		cur_angle = angle;
+		init_angle = angle;
+		init_pos = p;
+		proj_rad = rad;
+		time.restart();
+	}
+	else {
+		speed = sp;
+		shape = new sf::CircleShape();
+		shape->setFillColor(sf::Color::Magenta);
+		proj_rad = rad;
+		static_cast<sf::CircleShape*>(shape)->setRadius(proj_rad);
+		static_cast<sf::CircleShape*>(shape)->setOrigin(proj_rad / 2, proj_rad / 2);
+		shape->setPosition(p);
+		shape->setRotation(angle);
+		cur_angle = angle;
+		init_angle = angle;
+		init_pos = p;
+		expl_rad = explr;
+		movementVector.x = speed * (cos(cur_angle * pi / 180));
+		movementVector.y = speed * (sin(cur_angle * pi / 180));
+	}
 
 	//test
 	//time.restart();
@@ -60,8 +76,22 @@ void Projectile::draw(sf::RenderTarget & target, sf::RenderStates states) const
 	target.draw(*shape, states);
 }
 
+void Projectile::moveLazor(Terrain & terrain) {
+	if (time.getElapsedTime().asSeconds() >= 0.01f) {
+		destroyed = true;
+		return;
+	}
+	terrain.rayDestroy(init_pos, cur_angle, proj_rad);
+
+
+}
+
 void Projectile::move(Terrain & terrain) {
 	if (destroyed) return;
+	if (type == Projectile_type::LAZOR) {
+		Projectile::moveLazor(terrain);
+		return;
+	}
 	sf::Vector2f npos;
 	sf::Vector2f cpos = shape->getPosition();
 
