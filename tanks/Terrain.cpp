@@ -153,38 +153,10 @@ void Terrain::rayDestroy(sf::Vector2f origin, float angle,float thickness) {
 				hasFalling = true;
 				point->color.a = 0;
 
-				Range* current = &ranges[flatten(0, width - 1, cline.x)];
-				while (true) {
-					Range* next = current->next;
-					int hight = height - 1 - rint(cline.y);
-					if (hight < current->max && hight > current->min) {
-						int temp = current->max;
-						current->max = hight - 1;
-						Range* insert = new Range();
-						insert->min = hight + 1;
-						insert->max = temp;
-						insert->next = current->next;
-						current->next = insert;
-						break;
-					}
-					if (hight == current->max) {
-						current->max--;
-						break;
-					}
-					if (hight == current->min && hight != 0) {
-						current->min--;
-						break;
-					}
-					if (!next) {
-						break;
-					}
-					current = next;
-				}
+				range_destroy_single(round(cline.x), round(cline.y));
 			}
 			cline.x += 1 * cos(angle*pi / 180);
 			cline.y += 1 * sin(angle*pi / 180);
-			//cline.x += cline.x + 1.0;
-			//cline.y += cline.y + 1.0;
 		}
 	}
 	for (int i = 0; i < round(thickness / 2); i++) {
@@ -198,41 +170,11 @@ void Terrain::rayDestroy(sf::Vector2f origin, float angle,float thickness) {
 			x = flatten(0, height*width - 1, x);
 			sf::Vertex* point = &vArray[x];
 			if (point->color.a != 0) {
-				hasFalling = true;
 				point->color.a = 0;
-
-				Range* current = &ranges[flatten(0, width - 1, cline.x)];
-				while (true) {
-					Range* next = current->next;
-					int hight = height - 1 - rint(cline.y);
-					if (hight < current->max && hight > current->min) {
-						int temp = current->max;
-						current->max = hight - 1;
-						Range* insert = new Range();
-						insert->min = hight + 1;
-						insert->max = temp;
-						insert->next = current->next;
-						current->next = insert;
-						break;
-					}
-					if (hight == current->max) {
-						current->max--;
-						break;
-					}
-					if (hight == current->min && hight != 0) {
-						current->min--;
-						break;
-					}
-					if (!next) {
-						break;
-					}
-					current = next;
-				}
+				range_destroy_single(round(cline.x), round(cline.y));
 			}
 			cline.x += 1 * cos(angle*pi / 180);
 			cline.y += 1 * sin(angle*pi / 180);
-			//cline.x += cline.x + 1.0;
-			//cline.y += cline.y + 1.0;
 		}
 	}
 	/*while (cline.y >= 0 && cline.y < height && cline.x >= 0 && cline.x < width) {
@@ -281,7 +223,7 @@ void Terrain::rayDestroy(sf::Vector2f origin, float angle,float thickness) {
 	}*/
 	
 }
-void Terrain::destroy(sf::Vector2i pos, int radius) { 
+void Terrain::destroy_circle(sf::Vector2i pos, int radius) { 
 	//int quadPos = pos.x + pos.y * screenWidth;
 	//radius /= xSize * ySize;
 	pos.x /= xSize;
@@ -298,32 +240,7 @@ void Terrain::destroy(sf::Vector2i pos, int radius) {
 			if (squarePointDistance(sf::Vector2f(pos.x,pos.y), point->position) < radius * radius) {
 				point->color.a = 0;
 				Range* current = &ranges[i];
-				while (true) {
-					Range* next = current->next;
-					int hight = height - 1 - j ;
-					if (hight < current->max && hight > current->min) {
-						int temp = current->max;
-						current->max = hight - 1;
-						Range* insert = new Range();
-						insert->min = hight + 1;
-						insert->max = temp;
-						insert->next = current->next;
-						current->next = insert;
-						break;
-					}
-					if (hight == current->max) {
-						current->max--;
-						break;
-					}
-					if (hight == current->min && hight!=0) {
-						current->min--;
-						break;
-					}
-					if (!next) {
-						break;
-					}
-					current = next;
-				}
+				range_destroy_single(i, j);
 			}
 			
 		}
@@ -331,6 +248,37 @@ void Terrain::destroy(sf::Vector2i pos, int radius) {
 	hasFalling = true;
 }
 
+
+void Terrain::range_destroy_single(int x, int y) {
+	Range* current = (*this)[x];
+	while (current) {
+		Range* next = current->next;
+		int hight = height - 1 - y;
+		if (hight < current->max && hight > current->min) {
+			int temp = current->max;
+			current->max = hight - 1;
+			Range* insert = new Range();
+			insert->min = hight + 1;
+			insert->max = temp;
+			insert->next = current->next;
+			current->next = insert;
+			break;
+		}
+		if (hight == current->max) {
+			current->max--;
+			break;
+		}
+		if (hight == current->min && hight != 0) {
+			current->min--;
+			break;
+		}
+		if (!next) {
+			break;
+		}
+		current = next;
+	}
+	hasFalling = true;
+}
 void Terrain::displacement(float displace, float roughness) { 
 	ranges[0].max = rng::getRangeInt(100,500);
 	ranges[width-1].max = rng::getRangeInt(100, 500);

@@ -16,7 +16,7 @@ Projectile::Projectile(sf::Vector2f p, float angle, float sp, float explr)
 	shape->setFillColor(sf::Color::Magenta);
 	proj_rad = 4;
 	static_cast<sf::CircleShape*>(shape)->setRadius(proj_rad);
-	static_cast<sf::CircleShape*>(shape)->setOrigin(proj_rad/2, proj_rad/2);
+	static_cast<sf::CircleShape*>(shape)->setOrigin(proj_rad / 2, proj_rad/2);
 	shape->setPosition(p);
 	shape->setRotation(angle);
 	cur_angle = angle;
@@ -36,7 +36,7 @@ Projectile::Projectile(Projectile_type t, sf::Vector2f p, float angle, float sp,
 		shape = new sf::RectangleShape();
 		shape->setFillColor(sf::Color::Red);
 		static_cast<sf::RectangleShape*>(shape)->setSize(sf::Vector2f(1000,rad));
-		//static_cast<sf::RectangleShape*>(shape)->setOrigin(proj_rad / 2, proj_rad/2 );
+		static_cast<sf::RectangleShape*>(shape)->setOrigin(0, proj_rad/2 );//not working properly for some reason
 		shape->setPosition(p);
 		shape->setRotation(angle);
 		cur_angle = angle;
@@ -124,7 +124,7 @@ void Projectile::move(Terrain & terrain) {
 		Range* cur = terrain[cpos.x];
 		while (cur) {
 			if (600 - (cpos.y) >= cur->min && 600 - (cpos.y) <= cur->max) {
-				terrain.destroy(sf::Vector2i(npos.x, npos.y), expl_rad);
+				terrain.destroy_circle(sf::Vector2i(npos.x, npos.y), expl_rad);
 				destroyed = true;
 				speed = 0;
 				shape->setFillColor(sf::Color::Transparent);

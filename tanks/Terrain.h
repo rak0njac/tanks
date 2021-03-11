@@ -19,7 +19,7 @@ public:
 	Terrain(const std::string& file);
 	void rayDestroy(sf::Vector2f origin, float angle,float thickness);
 	virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const;
-	void destroy(sf::Vector2i pos, int radius);
+	void destroy_circle(sf::Vector2i pos, int radius);
 	void groundFall();
 	void groundFallThreaded(int thread);
 	Range* operator[](int);
@@ -31,6 +31,7 @@ public:
 private:
 	void displacement(float displace, float roughness);
 	void applyRange();
+	void range_destroy_single(int x, int y);
 
 	sf::Texture terrainTexture;
 
