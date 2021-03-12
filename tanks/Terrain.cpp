@@ -139,44 +139,8 @@ void Terrain::rayDestroy(sf::Vector2f origin, float angle,float thickness) {
 	float aup = angle + 90;
 	float adown = angle - 90;
 
-	for (int i = 0; i < round(thickness/2); i++) {
-		cline.x = origin.x+1*i * cos(aup*pi / 180);
-		cline.y = origin.y+1*i * sin(aup*pi / 180);
-		while (cline.y >= 0 && cline.y < height && cline.x >= 0 && cline.x < width) {
-
-			int x = cline.x + round(cline.y)*(width);
-			//printf("%d\n", x);
-
-			x = flatten(0, height*width - 1, x);
-			sf::Vertex* point = &vArray[x];
-			if (point->color.a != 0) {
-				hasFalling = true;
-				point->color.a = 0;
-
-				range_destroy_single(round(cline.x), round(cline.y));
-			}
-			cline.x += 1 * cos(angle*pi / 180);
-			cline.y += 1 * sin(angle*pi / 180);
-		}
-	}
-	for (int i = 0; i < round(thickness / 2); i++) {
-		cline.x = origin.x + 1 * i * cos(adown*pi / 180);
-		cline.y = origin.y + 1 * i * sin(adown*pi / 180);
-		while (cline.y >= 0 && cline.y < height && cline.x >= 0 && cline.x < width) {
-
-			int x = cline.x + round(cline.y)*(width);
-			//printf("%d\n", x);
-
-			x = flatten(0, height*width - 1, x);
-			sf::Vertex* point = &vArray[x];
-			if (point->color.a != 0) {
-				point->color.a = 0;
-				range_destroy_single(round(cline.x), round(cline.y));
-			}
-			cline.x += 1 * cos(angle*pi / 180);
-			cline.y += 1 * sin(angle*pi / 180);
-		}
-	}
+	ray_destroy_multi(origin, angle, aup, thickness);
+	ray_destroy_multi(origin, angle, adown, thickness);
 	/*while (cline.y >= 0 && cline.y < height && cline.x >= 0 && cline.x < width) {
 
 		int x = cline.x + round(cline.y)*(width);
@@ -222,6 +186,29 @@ void Terrain::rayDestroy(sf::Vector2f origin, float angle,float thickness) {
 		//cline.y += cline.y + 1.0;
 	}*/
 	
+}
+
+void Terrain::ray_destroy_multi(sf::Vector2f origin, float angle, float other_angle, float thickness)
+{
+	const float precision = 1.0f;
+	sf::Vector2f cline = origin;
+	for (int i = 0; i < round(thickness / 2); i++) {
+		cline.x = origin.x + 1 * i * cos(other_angle*pi / 180);
+		cline.y = origin.y + 1 * i * sin(other_angle*pi / 180);
+		while (cline.y >= 0 && cline.y < height && cline.x >= 0 && cline.x < width) {
+
+			//int x = round(cline.x) + round(cline.y)*(width);
+			int x = round(cline.x) + round(cline.y)*(width);
+			x = flatten(0, height*width - 1, x);
+			sf::Vertex* point = &vArray[x];
+			if (point->color.a != 0) {
+				point->color.a = 0;
+				range_destroy_single(round(cline.x), round(cline.y));
+			}
+			cline.x += precision * cos(angle*pi / 180);
+			cline.y += precision * sin(angle*pi / 180);
+		}
+	}
 }
 void Terrain::destroy_circle(sf::Vector2i pos, int radius) { 
 	//int quadPos = pos.x + pos.y * screenWidth;

@@ -32,7 +32,7 @@ private:
 	void displacement(float displace, float roughness);
 	void applyRange();
 	void range_destroy_single(int x, int y);
-
+	void ray_destroy_multi(sf::Vector2f origin, float angle, float other_angle, float thickness);
 	sf::Texture terrainTexture;
 
 	bool hasFalling = false;
