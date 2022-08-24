@@ -4,7 +4,7 @@
 
 std::vector<Weapon> Parser::parse(std::string file)
 {
-	printf("1");
+	//printf("1");
 	std::vector<Weapon> weapons;
 	std::string buf;
 	char cget = 0;
@@ -21,23 +21,23 @@ std::vector<Weapon> Parser::parse(std::string file)
 		float drop_rate = 3;
 		int readchars = 0;
 		WeaponType type = WeaponType::STANDARD;
-		printf("1\n");
+		//printf("1\n");
 
 		while (cget <= 40) stream.get(cget);
 		while (( cget != '{' && cget != ':' && cget != '}')) {
-			printf("%c", cget);
+			//printf("%c", cget);
 			buf.push_back(cget);
 			readchars++;
 			cget = stream.get();
 		}
-		printf("%d\n", readchars);
-		printf("2\n");
+		//printf("%d\n", readchars);
+		//printf("2\n");
 		readchars = 0;
 		name = buf;
 		buf.clear();
-		printf("3\n");
+		//printf("3\n");
 		if (cget == ':') {
-			printf(":\n");
+			//printf(":\n");
 			while (stream.peek() <= 40) stream.get();
 			cget = stream.get();
 			while (cget != '{') {
@@ -52,7 +52,7 @@ std::vector<Weapon> Parser::parse(std::string file)
 				cget = stream.get();
 			}
 			readchars = 0;
-			printf("%s\n", buf.c_str());
+			//printf("%s\n", buf.c_str());
 			if (buf == "STANDARD") {
 				type = WeaponType::STANDARD;
 			}
@@ -60,8 +60,8 @@ std::vector<Weapon> Parser::parse(std::string file)
 				type = WeaponType::LAZOR;
 			}
 		}
-		printf("4\n");
-		printf("5\n");
+		//printf("4\n");
+		//printf("5\n");
 		while (cget != '}') {
 			float value = 0;
 			buf.clear();
@@ -89,7 +89,7 @@ std::vector<Weapon> Parser::parse(std::string file)
 				cooldown = value;
 			}
 		}
-		printf("%s %f %f %f %f %f\n",name.c_str(),expl_size,cooldown,speed,proj_rad,drop_rate);
+		//printf("%s %f %f %f %f %f\n",name.c_str(),expl_size,cooldown,speed,proj_rad,drop_rate);
 		Weapon w(name, type, expl_size, cooldown, speed, proj_rad, drop_rate);
 		weapons.push_back(w);
 

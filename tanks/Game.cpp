@@ -19,7 +19,7 @@ Game::Game()
 	//grm.players.push_back(new Player());
 	all_weapons = Parser::parse("weapons.txt");
 	for (int i = 0; i < all_weapons.size(); i++) {
-		res.players[0]->add_wep(all_weapons[i]);
+		res.players[0]->add_weapon(all_weapons[i]);
 		//grm.players[1]->add_wep(all_weapons[i]);
 	}
 	//grm.players[0].add_wep(Weapon());
@@ -139,7 +139,7 @@ void Game::logic() {
 	}*/
 	terrain->groundFall();
 	for (int i = 0; i < res.players.size(); i++) {
-		res.players[i]->update(*terrain, sf::Vector2f(0,0), window->mapPixelToCoords(mousepos, view), res);
+		res.players[i]->logic(*terrain, sf::Vector2f(0,0), window->mapPixelToCoords(mousepos, view), res);
 	}
 	//for (Projectile* p : res.projectiles) {
 	//	if (p->destroyed) {
@@ -170,8 +170,8 @@ void Game::logic() {
 void Game::handlePress(sf::Keyboard::Key key, bool pressed)
 {
 	switch (key) {
-	case sf::Keyboard::D: res.players[0]->movingRight = pressed; break;
-	case sf::Keyboard::A: res.players[0]->movingLeft = pressed; break;
+	case sf::Keyboard::D: res.players[0]->direction = pressed; break;
+	case sf::Keyboard::A: res.players[0]->direction = pressed * -1; break;
 	}
 }
 
@@ -184,5 +184,5 @@ void Game::handleMousePress(sf::Mouse::Button button, bool pressed)
 
 void Game::handleMouseWheel(int scrolled)
 {
-	res.players[0]->change_wep(scrolled);
+	res.players[0]->change_weapon(scrolled);
 }
