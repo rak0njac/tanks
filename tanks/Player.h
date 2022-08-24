@@ -13,6 +13,7 @@ public:
 	Player();
 	~Player();
 	virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const;
+	void shoot(Weapon &weapon);
 	void shoot( std::list<Projectile*>& projectiles);
 	void add_wep(Weapon wep);
 	void change_wep(int);

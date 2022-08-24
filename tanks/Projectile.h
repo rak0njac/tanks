@@ -4,8 +4,8 @@
 
 enum class Projectile_type {
 	Rect,
-	Circ,
-	LAZOR
+	Standard,
+	Laser
 };
 
 class Projectile: public sf::Drawable
@@ -28,7 +28,7 @@ public:
 	sf::Clock time;
 	float speed;
 	sf::Shape *shape;
-	Projectile_type type = Projectile_type::Circ;
+	Projectile_type type = Projectile_type::Standard;
 	float cur_angle;
 	bool destroyed = false;
 	float expl_rad;

@@ -25,7 +25,7 @@ public:
 	Range* operator[](int);
 	Range* operator[](float);
 
-	sf::VertexArray vArray;
+	sf::VertexArray vertices;
 	std::vector<Range> ranges;
 
 private:

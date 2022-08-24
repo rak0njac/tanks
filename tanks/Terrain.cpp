@@ -49,7 +49,7 @@ Terrain::~Terrain()
 void Terrain::draw(sf::RenderTarget & target, sf::RenderStates states) const
 {
 	states.texture = &terrainTexture;
-	target.draw(vArray, states);
+	target.draw(vertices, states);
 }
 
 Terrain::Terrain(const std::string & file) // file = image file for the texture
@@ -58,13 +58,13 @@ Terrain::Terrain(const std::string & file) // file = image file for the texture
 	terrainTexture.setRepeated(true);
 	//vArray.setPrimitiveType(sf::Quads);
 	//vArray.setPrimitiveType(sf::Quads);
-	vArray.resize(width * height); //4
-	for (int i = 0; i < width; i++) {
-		for (int j = 0; j < height; j++) {
+	vertices.resize(width * height); //4
+	for (int i = 1; i < width; i++) {
+		for (int j = 1; j < height; j++) {
 			//sf::Vertex* quad = &vArray[(i + j * width) * 4];
-			sf::Vertex* point = &vArray[(i + j * width)];
+			sf::Vertex* point = &vertices[(i + j * width)];
 
-			point->position = sf::Vector2f((i * xSize) +0.5f,(j * ySize) +0.5f);
+			point->position = sf::Vector2f((i * xSize),(j * ySize)); //CHECK: zasto se ovde dodavalo +0.5f?
 			point->texCoords = sf::Vector2f(i * xSize*2, j * ySize*2);
 
 			/*quad[0].position = sf::Vector2f(i * xSize, j * ySize);
@@ -200,7 +200,7 @@ void Terrain::ray_destroy_multi(sf::Vector2f origin, float angle, float other_an
 			//int x = round(cline.x) + round(cline.y)*(width);
 			int x = round(cline.x) + round(cline.y)*(width);
 			x = flatten(0, height*width - 1, x);
-			sf::Vertex* point = &vArray[x];
+			sf::Vertex* point = &vertices[x];
 			if (point->color.a != 0) {
 				point->color.a = 0;
 				range_destroy_single(round(cline.x), round(cline.y));
@@ -221,8 +221,8 @@ void Terrain::destroy_circle(sf::Vector2i pos, int radius) {
 		int j = pos.y - radius;
 		if (j < 0) j = 0;
 		for (j; j < pos.y + radius && j < height; j++) {
-			sf::Vertex* point = &vArray[(i + j * width)];
-			if (point->color.a == 0) continue;
+			sf::Vertex* point = &vertices[(i + j * width)];
+			//if (point->color.a == 0) continue;
 
 			if (squarePointDistance(sf::Vector2f(pos.x,pos.y), point->position) < radius * radius) {
 				point->color.a = 0;
@@ -240,22 +240,22 @@ void Terrain::range_destroy_single(int x, int y) {
 	Range* current = (*this)[x];
 	while (current) {
 		Range* next = current->next;
-		int hight = height - 1 - y;
-		if (hight < current->max && hight > current->min) {
+		int height = height - 1 - y;
+		if (height < current->max && height > current->min) {
 			int temp = current->max;
-			current->max = hight - 1;
+			current->max = height - 1;
 			Range* insert = new Range();
-			insert->min = hight + 1;
+			insert->min = height + 1;
 			insert->max = temp;
 			insert->next = current->next;
 			current->next = insert;
 			break;
 		}
-		if (hight == current->max) {
+		if (height == current->max) {
 			current->max--;
 			break;
 		}
-		if (hight == current->min && hight != 0) {
+		if (height == current->min && height != 0) {
 			current->min--;
 			break;
 		}
@@ -309,7 +309,7 @@ void Terrain::applyRange() { //makes pixels that aren't in the current range tra
 			int y = i + ((height - (j-1))*width);
 			if (y < 0) y = 0;
 			if (y >= width * height) y = width * height - 1;
-			vArray[y].color.a = 0;
+			vertices[y].color.a = 0;
 		}
 	}
 }
@@ -360,8 +360,8 @@ void Terrain::groundFallThreaded(int thread) {//makes each row of ground fall do
 					/*sf::Vector2f temp = std::move(vArray[(i + y * width)].texCoords);
 					vArray[(i + y * width)].texCoords = std::move(vArray[(i + (y + 1) * width)].texCoords);
 					vArray[(i + (y + 1) * width)].texCoords = std::move(temp);*/
-					sf::Vertex& falling = vArray[(i + y * width)];
-					sf::Vertex& rising = vArray[(i + (y+1) * width)];
+					sf::Vertex& falling = vertices[(i + y * width)];
+					sf::Vertex& rising = vertices[(i + (y+1) * width)];
 					float x1 = falling.texCoords.x;
 					float y1 = falling.texCoords.y;
 					falling.texCoords.x = rising.texCoords.x;

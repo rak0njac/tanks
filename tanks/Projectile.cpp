@@ -31,7 +31,7 @@ Projectile::Projectile(sf::Vector2f p, float angle, float sp, float explr)
 Projectile::Projectile(Projectile_type t, sf::Vector2f p, float angle, float sp, float explr, float rad)
 {
 	type = t;
-	if (type == Projectile_type::LAZOR) {
+	if (type == Projectile_type::Laser) {
 		speed = sp;
 		shape = new sf::RectangleShape();
 		shape->setFillColor(sf::Color::Red);
@@ -88,7 +88,7 @@ void Projectile::moveLazor(Terrain & terrain) {
 
 void Projectile::move(Terrain & terrain) {
 	if (destroyed) return;
-	if (type == Projectile_type::LAZOR) {
+	if (type == Projectile_type::Laser) {
 		Projectile::moveLazor(terrain);
 		return;
 	}

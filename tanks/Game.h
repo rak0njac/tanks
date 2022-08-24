@@ -14,9 +14,9 @@ public:
 	~Game();
 
 	void run();
-	void pool();
+	void poll();
 	void render();
-	void update();
+	void logic();
 	void init_weapons();
 	void handlePress(sf::Keyboard::Key key, bool pressed);
 	void handleMousePress(sf::Mouse::Button button, bool pressed);
@@ -25,9 +25,9 @@ public:
 	
 
 private:
-	GameResourceManager grm;
+	GameResourceManager res;
 	sf::RenderWindow *window;
-	sf::View gameView;
+	sf::View view;
 	sf::View hudView;
 	Terrain* terrain;
 	HUD* hud;

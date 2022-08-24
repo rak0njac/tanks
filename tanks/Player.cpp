@@ -28,7 +28,7 @@ Player::Player()
 {
 	body.setFillColor(sf::Color::Blue);
 	body.setSize(sf::Vector2f(20,10));
-	body.setOrigin(sf::Vector2f(10, 5));
+	body.setOrigin(sf::Vector2f(10, 10));
 
 	tube.setFillColor(sf::Color::Green);
 	tube.setSize(sf::Vector2f(15, 3));
@@ -54,6 +54,8 @@ Player::~Player()
 {
 }
 
+void Player::shoot(Weapon& weapon){}
+
 void Player::shoot(std::list <Projectile*>& projectiles) {
 	if (weapons.size() <= 0) return;
 	weapons[currentWeapon].fire(tube.getPosition() , tube.getRotation(), projectiles);
@@ -62,7 +64,6 @@ void Player::shoot(std::list <Projectile*>& projectiles) {
 void Player::add_wep(Weapon wep)
 {
 	weapons.push_back(wep);
-	
 }
 
 void Player::change_wep(int i)
@@ -86,7 +87,7 @@ void Player::draw(sf::RenderTarget & target, sf::RenderStates states) const
 }
 
 void Player::update(
-	const Terrain & terrain,
+	const Terrain &terrain,
 	sf::Vector2f mv,
 	const sf::Vector2f & mousepos,
 	GameResourceManager& grm)
@@ -180,8 +181,10 @@ void Player::move(const Terrain & terrain, sf::Vector2f mv, const sf::Vector2f &
 	body.setPosition(pos);
 #endif
 #if 1
-	int circX = collisionCircle.getPosition().x;
-	int circY = 600 - (collisionCircle.getPosition().y) - collisionCircle.getRadius();
+	//int circX = collisionCircle.getPosition().x;
+	//int circY = 600 - (collisionCircle.getPosition().y) - collisionCircle.getRadius();
+	int circX = body.getPosition().x;
+	int circY = 600 - body.getPosition().y;// -body.getPosition().x;
 	if (circX > 799) {
 		circX = 799;
 	}
@@ -208,6 +211,8 @@ void Player::move(const Terrain & terrain, sf::Vector2f mv, const sf::Vector2f &
 		falling = false;
 	}
 	
+
+	// HERE START CALCULATING NORMAL BETWEEN CURRENT AND FIRST CLOSEST VERTEX AND SETTING THE ROTATION BASED ON THAT RESULT
 	if (!falling) {
 		if (movingRight) {
 			int toMove = circX + static_cast<int>(moveSpeed);
@@ -226,7 +231,7 @@ void Player::move(const Terrain & terrain, sf::Vector2f mv, const sf::Vector2f &
 				float diff = (std::atan(current->max - currentY) * 180 / pi) / 90;
 				movementVec.x += moveSpeed * (1 - diff);
 				movementVec.y -= moveSpeed * diff;
-				ang  = -45*diff;
+				ang = -60*diff;
 			}
 		}
 		else if (movingLeft) {

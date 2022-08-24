@@ -4,10 +4,10 @@
 
 HUD::HUD(const std::string &filename)
 {
-	if (!font.loadFromFile(filename))
-	{
-		std::cout << "can't load font" << std::endl;
-	}
+	//if (!font.loadFromFile(filename))
+	//{
+	//	std::cout << "can't load font" << std::endl;
+	//}
 	
 
 	fireText.setFont(font);
