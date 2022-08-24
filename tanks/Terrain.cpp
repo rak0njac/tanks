@@ -240,22 +240,22 @@ void Terrain::range_destroy_single(int x, int y) {
 	Range* current = (*this)[x];
 	while (current) {
 		Range* next = current->next;
-		int height = height - 1 - y;
-		if (height < current->max && height > current->min) {
+		int yet_another_height = height - 1 - y;
+		if (yet_another_height < current->max && yet_another_height > current->min) {
 			int temp = current->max;
-			current->max = height - 1;
+			current->max = yet_another_height - 1;
 			Range* insert = new Range();
-			insert->min = height + 1;
+			insert->min = yet_another_height + 1;
 			insert->max = temp;
 			insert->next = current->next;
 			current->next = insert;
 			break;
 		}
-		if (height == current->max) {
+		if (yet_another_height == current->max) {
 			current->max--;
 			break;
 		}
-		if (height == current->min && height != 0) {
+		if (yet_another_height == current->min && yet_another_height != 0) {
 			current->min--;
 			break;
 		}

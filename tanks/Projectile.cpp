@@ -102,8 +102,8 @@ void Projectile::move(Terrain & terrain) {
 	//npos.y = cpos.y + speed * (sin(cur_angle * pi / 180));
 	shape->setPosition(npos);
 	movementVector.y += drop_rate * frame;
-	cur_angle = atan2(movementVector.y, movementVector.x) * 180/pi;
-	shape->setRotation(cur_angle);
+	//cur_angle = atan2(movementVector.y, movementVector.x) * 180/pi;
+	//shape->setRotation(cur_angle);
 	/*if (cpos.x >aa < 800) {
 		const Range* cur = &terrain.ranges[cpos.x];
 		while (cur) {
