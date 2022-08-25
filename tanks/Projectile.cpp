@@ -81,7 +81,7 @@ void Projectile::moveLazor(Terrain & terrain) {
 		destroyed = true;
 		return;
 	}
-	terrain.rayDestroy(init_pos, cur_angle, proj_rad);
+	//terrain.rayDestroy(init_pos, cur_angle, proj_rad);
 
 
 }
@@ -120,6 +120,8 @@ void Projectile::move(Terrain & terrain) {
 	}*/
 	//int fac = cpos.x > npos.x ? -1 : 1;
 	//float step = 1;
+	// 
+	// 	   USEFUL CODE - BE CAREFUL!!!
 	for(int i = 0; i<=(speed+ static_cast<sf::CircleShape*>(shape)->getRadius())&& !destroyed;i++) {
 		Range* cur = terrain[cpos.x];
 		while (cur) {

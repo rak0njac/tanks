@@ -30,9 +30,9 @@ public:
 	int direction = 0;
 
 private:
-	sf::RectangleShape body;
+	sf::CircleShape collider;
 	sf::RectangleShape tube;
-	//sf::CircleShape collisionCircle;
+	sf::RectangleShape body;
 	//sf::Vector2f pos;
 	//sf::Vector2f movementVec;
 	std::vector<Weapon> weapons;

@@ -7,7 +7,7 @@ const sf::Time time_per_frame = sf::seconds(1.0f / 60.0f);
 Game::Game()
 {
 	window = new sf::RenderWindow(sf::VideoMode(800, 600), "tanks");
-	terrain = new Terrain("assets\\ground.jpg");
+	terrain = new Terrain("NULL");
 	hud = new HUD("assets\\Lato-Regular.ttf");
 	view.setCenter(window->getSize().x / 2, window->getSize().y / 2);
 	view.setSize(window->getSize().x, window->getSize().y * 0.75f);

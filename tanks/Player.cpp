@@ -27,15 +27,21 @@ sf::Vector2f closestPointOnLine(const sf::Vector2f& l1, const sf::Vector2f& l2, 
 
 Player::Player()
 {
-	body.setFillColor(sf::Color::Blue);
-	body.setSize(sf::Vector2f(20, 10));
-	body.setPosition(100, 10);
-	body.setOrigin(body.getLocalBounds().width / 2, body.getLocalBounds().height);
+	collider.setFillColor(sf::Color::Blue);
+	collider.setPointCount(5);
+	collider.setRadius(10);
+	collider.setPosition(100, 10);
+	collider.setOrigin(collider.getLocalBounds().width / 2, collider.getLocalBounds().height);
 
 	tube.setFillColor(sf::Color::Green);
 	tube.setSize(sf::Vector2f(15, 3));
-	tube.setPosition(body.getPosition().x, body.getPosition().y - 5);
-	tube.setOrigin(sf::Vector2f(0, 1.5));
+	tube.setPosition(collider.getPosition().x, collider.getPosition().y);
+	tube.setOrigin(sf::Vector2f(1.5, 1.5));
+
+	body.setSize(sf::Vector2f(20, 10));
+	body.setFillColor(sf::Color::Red);
+	body.setPosition(collider.getPosition());
+	body.setOrigin(body.getLocalBounds().width / 2, body.getLocalBounds().height - 2);
 }
 
 
@@ -64,14 +70,14 @@ void Player::change_weapon(int i)
 
 void Player::draw(sf::RenderTarget &target, sf::RenderStates states) const
 {
-	target.draw(tube, states);
 	target.draw(body, states);
+	target.draw(tube, states);
 }
 
 void Player::logic(const Terrain& terrain, sf::Vector2f mv, const sf::Vector2f& mousepos, GameResourceManager& grm)
 {
 	if (firing) shoot(grm.projectiles);
-	move_tube(mousepos);
+	//move_tube(mousepos);
 	move(terrain);
 }
 
@@ -83,41 +89,53 @@ void Player::move_tube(const sf::Vector2f& mousepos) {
 
 void Player::move(const Terrain& terrain)
 {
-	if (body.getPosition().x > 799) {
-		body.setPosition(799, body.getPosition().y);
+	if (collider.getPosition().x < 10 || collider.getPosition().x > 790) {
+		direction = 0;
+		collider.setPosition(10, collider.getPosition().y);
 	}
-	if (body.getPosition().y < 0) {
-		body.setPosition(body.getPosition().x, 0);
+	if (collider.getPosition().y < 0) {
+		collider.setPosition(collider.getPosition().x, 0);
 	}
-	if (body.getPosition().y > 450) {
-		body.setPosition(body.getPosition().x, 450);
+	if (collider.getPosition().y > 450) {
+		collider.setPosition(collider.getPosition().x, 450);
 	}
 
-	const Range* prev_range = &terrain.ranges[body.getPosition().x - 1];
-	const Range* current_range = &terrain.ranges[body.getPosition().x];
-	const Range* next_range = &terrain.ranges[body.getPosition().x + 1];
+	const Range* prev_range = &terrain.ranges[collider.getTransform().transformPoint(collider.getPoint(3)).x];
+	const Range* current_range = &terrain.ranges[collider.getPosition().x];
+	const Range* next_range = &terrain.ranges[collider.getTransform().transformPoint(collider.getPoint(2)).x];
 
-	if (body.getPosition().y < 600 - current_range->max) {
+	
+	//const Range* prev_range = &terrain.ranges[body.getPosition().x - 1];
+	//const Range* current_range = &terrain.ranges[body.getPosition().x];
+	//const Range* next_range = &terrain.ranges[body.getPosition().x + 1];
+
+	if (collider.getPosition().y < 600 - current_range->max) {
 		falling = true;
-		body.move(0, const_falling_speed);
+		collider.move(0, const_falling_speed);
 		tube.move(0, const_falling_speed);
 	}
 	else falling = false;
 
 	if (!falling && direction != 0) {
-		float x1 = body.getPosition().x - 1;
-		float x2 = body.getPosition().x + 1;
+		float x1 = collider.getTransform().transformPoint(collider.getPoint(3)).x;
+		float x2 = collider.getTransform().transformPoint(collider.getPoint(2)).x;
 		float y1 = 600 - prev_range->max;
 		float y2 = 600 - next_range->max;
 
 		float angle = atan2(y2 - y1, x2 - x1) * 180 / pi;
 
-		std::cout << prev_range->max << std::endl;
-		std::cout << next_range->max << std::endl;
+		//std::cout << body.getTransform().transformPoint(body.getPoint(0)).x << std::endl;
+		std::cout << angle << std::endl;
+			
+
 		std::cout << std::endl;
 
-		body.setPosition(body.getPosition().x + direction, 600 - current_range->max);
-		tube.setPosition(tube.getPosition().x + direction, 600 - current_range->max - 5);
+		collider.setPosition(collider.getPosition().x + direction, 600 - current_range->max);
+		tube.setPosition(collider.getPosition().x, collider.getPosition().y - 5);
+		collider.setRotation(angle);
+		tube.setRotation(-45);
+
+		body.setPosition(collider.getPosition());
 		body.setRotation(angle);
 		}
 }
