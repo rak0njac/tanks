@@ -24,7 +24,6 @@ sf::Vector2f closestPointOnLine(const sf::Vector2f& l1, const sf::Vector2f& l2, 
 }
 
 
-
 Player::Player()
 {
 	collider.setFillColor(sf::Color::Blue);
@@ -77,7 +76,6 @@ void Player::draw(sf::RenderTarget &target, sf::RenderStates states) const
 void Player::logic(const Terrain& terrain, sf::Vector2f mv, const sf::Vector2f& mousepos, GameResourceManager& grm)
 {
 	if (firing) shoot(grm.projectiles);
-	//move_tube(mousepos);
 	move(terrain);
 }
 
@@ -104,10 +102,6 @@ void Player::move(const Terrain& terrain)
 	const Range* current_range = &terrain.ranges[collider.getPosition().x];
 	const Range* next_range = &terrain.ranges[collider.getTransform().transformPoint(collider.getPoint(2)).x];
 
-	
-	//const Range* prev_range = &terrain.ranges[body.getPosition().x - 1];
-	//const Range* current_range = &terrain.ranges[body.getPosition().x];
-	//const Range* next_range = &terrain.ranges[body.getPosition().x + 1];
 
 	if (collider.getPosition().y < 600 - current_range->max) {
 		falling = true;
@@ -124,18 +118,18 @@ void Player::move(const Terrain& terrain)
 
 		float angle = atan2(y2 - y1, x2 - x1) * 180 / pi;
 
-		//std::cout << body.getTransform().transformPoint(body.getPoint(0)).x << std::endl;
-		std::cout << angle << std::endl;
-			
+		if (angle > 60.0f && direction == -1) return;
+		if (angle < -60.0f && direction == 1) return;
 
-		std::cout << std::endl;
+		float new_pos_x = collider.getPosition().x + direction;
+		float new_pos_y = 600 - current_range->max;
 
-		collider.setPosition(collider.getPosition().x + direction, 600 - current_range->max);
+		collider.setPosition(new_pos_x, new_pos_y);
 		tube.setPosition(collider.getPosition().x, collider.getPosition().y - 5);
 		collider.setRotation(angle);
 		tube.setRotation(-45);
 
 		body.setPosition(collider.getPosition());
 		body.setRotation(angle);
-		}
+	}
 }
