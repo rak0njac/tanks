@@ -28,18 +28,18 @@ Player::Player()
 {
 	collider.setFillColor(sf::Color::Blue);
 	collider.setPointCount(5);
-	collider.setRadius(10);
+	collider.setRadius(5);
 	collider.setPosition(100, 10);
 	collider.setOrigin(collider.getLocalBounds().width / 2, collider.getLocalBounds().height);
 
 	tube.setFillColor(sf::Color::Green);
 	tube.setSize(sf::Vector2f(15, 3));
-	tube.setPosition(collider.getPosition().x, collider.getPosition().y);
+	//tube.setPosition(collider.getPosition());
 	tube.setOrigin(sf::Vector2f(1.5, 1.5));
 
 	body.setSize(sf::Vector2f(20, 10));
 	body.setFillColor(sf::Color::Red);
-	body.setPosition(collider.getPosition());
+	//body.setPosition(collider.getPosition());
 	body.setOrigin(body.getLocalBounds().width / 2, body.getLocalBounds().height - 2);
 }
 
@@ -87,49 +87,61 @@ void Player::move_tube(const sf::Vector2f& mousepos) {
 
 void Player::move(const Terrain& terrain)
 {
-	if (collider.getPosition().x < 10 || collider.getPosition().x > 790) {
+	// EDGE CASES TODO: refactor
+	if (collider.getPosition().x < 10) {
 		direction = 0;
 		collider.setPosition(10, collider.getPosition().y);
+	}
+	if (collider.getPosition().x > 790) {
+		direction = 0;
+		collider.setPosition(790, collider.getPosition().y);
 	}
 	if (collider.getPosition().y < 0) {
 		collider.setPosition(collider.getPosition().x, 0);
 	}
-	if (collider.getPosition().y > 450) {
-		collider.setPosition(collider.getPosition().x, 450);
+	if (collider.getPosition().y > 600) {
+		collider.setPosition(collider.getPosition().x, 600);
 	}
 
-	const Range* prev_range = &terrain.ranges[collider.getTransform().transformPoint(collider.getPoint(3)).x];
-	const Range* current_range = &terrain.ranges[collider.getPosition().x];
-	const Range* next_range = &terrain.ranges[collider.getTransform().transformPoint(collider.getPoint(2)).x];
+	// COLLISION POINTS
+	// sf::Circle "collider" has 5 points, we need the current horizontal position of the bottommost 
+	// two points in order to perform a perpendicular calculation on that line
+	int first_collision_point = collider.getTransform().transformPoint(collider.getPoint(3)).x;
+	int second_collision_point = collider.getTransform().transformPoint(collider.getPoint(2)).x;
 
+	//TODO make ranges obsolete and figure out a better way
+	const Range* prev_range = &terrain.ranges[first_collision_point];			//the range of vertical pixels from terrain at the location of the first collision point
+	const Range* current_range = &terrain.ranges[collider.getPosition().x];		//the range between the first and second collision point (used for moving, not important for collision)
+	const Range* next_range = &terrain.ranges[second_collision_point];
 
-	if (collider.getPosition().y < 600 - current_range->max) {
-		falling = true;
+	if (collider.getPosition().y < (600 - current_range->max) - 3) { // if (collision detected); TODO: 3 is the best magicnum out of them all....
 		collider.move(0, const_falling_speed);
 		tube.move(0, const_falling_speed);
 	}
-	else falling = false;
 
-	if (!falling && direction != 0) {
-		float x1 = collider.getTransform().transformPoint(collider.getPoint(3)).x;
-		float x2 = collider.getTransform().transformPoint(collider.getPoint(2)).x;
+	else if (direction != 0) {
+		float x1 = first_collision_point;
+		float x2 = second_collision_point;
 		float y1 = 600 - prev_range->max;
 		float y2 = 600 - next_range->max;
 
-		float angle = atan2(y2 - y1, x2 - x1) * 180 / pi;
+		float angle = atan2(y2 - y1, x2 - x1) * 180 / pi;	// y2 - y1 and x2 - x1 is the perpendicular line to the line formed out of terrain pixels exactly below our horizontal collision points. And then we just atan to get the angle.
 
-		if (angle > 60.0f && direction == -1) return;
+		//steep hill edge cases
+		if (angle > 60.0f && direction == -1) return;	
 		if (angle < -60.0f && direction == 1) return;
 
-		float new_pos_x = collider.getPosition().x + direction;
-		float new_pos_y = 600 - current_range->max;
+		float new_pos_x = collider.getPosition().x + direction;		// every horizontal move is always 1px
+		current_range = &terrain.ranges[collider.getPosition().x];	// get the next vertical pixel range from terrain since we moved horizontally by 1px
+		float new_pos_y = 600 - current_range->max;					// set our new vertical position to the range's topmost pixel
 
 		collider.setPosition(new_pos_x, new_pos_y);
-		tube.setPosition(collider.getPosition().x, collider.getPosition().y - 5);
 		collider.setRotation(angle);
-		tube.setRotation(-45);
-
-		body.setPosition(collider.getPosition());
-		body.setRotation(angle);
 	}
+
+	tube.setPosition(collider.getPosition().x, collider.getPosition().y - 5);	//TODO remove magicnum
+	tube.setRotation(-45);		//TODO
+
+	body.setPosition(collider.getPosition());
+	body.setRotation(collider.getRotation());
 }

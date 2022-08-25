@@ -14,6 +14,7 @@ Game::Game()
 	view.setViewport(sf::FloatRect(0, 0, 1, 0.75f));
 
 	window->setView(view);
+	//window->setFramerateLimit(60);
 
 	res.players.push_back(new Player());
 	//grm.players.push_back(new Player());
@@ -66,7 +67,12 @@ void Game::run()
 	//rect.setFillColor(sf::Color::Red);
 	
 	while (window->isOpen()) {
-		//poll();
+
+
+
+
+
+		poll();
 		time_since_update += tick.restart();
 		if (time_since_update >= time_per_frame) {
 			poll();
