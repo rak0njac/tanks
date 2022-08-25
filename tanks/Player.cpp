@@ -8,13 +8,13 @@ const float pi = std::acos(-1);
 sf::Vector2f closestPointOnLine(const sf::Vector2f& l1, const sf::Vector2f& l2, const sf::Vector2f& p) {
 	float a1 = l2.y - l1.y;
 	float b1 = l1.x - l2.x;
-	double c1 = (l2.y - l1.y) * l1.x + (l1.x - l2.x) * l1.y;
-	double c2 = -b1 * p.x + a1 * p.y;
-	double det = (a1 * a1 - (-b1 * b1));
+	float c1 = (l2.y - l1.y) * l1.x + (l1.x - l2.x) * l1.y;
+	float c2 = -b1 * p.x + a1 * p.y;
+	float det = (a1 * a1 - (-b1 * b1));
 	sf::Vector2f c;
 	if (det != 0) {
-		c.x = (float)((a1 * c1 - b1 * c2) / det);
-		c.y = (float)((a1 * c2 - (-b1 * c1)) / det);
+		c.x = (a1 * c1 - b1 * c2) / det;
+		c.y = (a1 * c2 - (-b1 * c1)) / det;
 	}
 	else {
 		c.x = p.x;
@@ -73,9 +73,10 @@ void Player::draw(sf::RenderTarget &target, sf::RenderStates states) const
 	target.draw(tube, states);
 }
 
-void Player::logic(const Terrain& terrain, sf::Vector2f mv, const sf::Vector2f& mousepos, GameResourceManager& grm)
+void Player::logic(Terrain& terrain, sf::Vector2f mv, const sf::Vector2f& mousepos, GameResourceManager& grm)
 {
 	if (firing) shoot(grm.projectiles);
+	move_tube(mousepos);
 	move(terrain);
 }
 
@@ -85,7 +86,7 @@ void Player::move_tube(const sf::Vector2f& mousepos) {
 	tube.setRotation(tube_angle);
 }
 
-void Player::move(const Terrain& terrain)
+void Player::move(Terrain& terrain)
 {
 	// EDGE CASES TODO: refactor
 	if (collider.getPosition().x < 10) {
@@ -109,21 +110,42 @@ void Player::move(const Terrain& terrain)
 	int first_collision_point = collider.getTransform().transformPoint(collider.getPoint(3)).x;
 	int second_collision_point = collider.getTransform().transformPoint(collider.getPoint(2)).x;
 
+	int prev_range_new = terrain.getRangeNEW(first_collision_point);
+	int current_range_new = terrain.getRangeNEW(collider.getPosition().x);
+	int next_range_new = terrain.getRangeNEW(second_collision_point);
+
 	//TODO make ranges obsolete and figure out a better way
 	const Range* prev_range = &terrain.ranges[first_collision_point];			//the range of vertical pixels from terrain at the location of the first collision point
 	const Range* current_range = &terrain.ranges[collider.getPosition().x];		//the range between the first and second collision point (used for moving, not important for collision)
 	const Range* next_range = &terrain.ranges[second_collision_point];
 
-	if (collider.getPosition().y < (600 - current_range->max) - 3) { // if (collision detected); TODO: 3 is the best magicnum out of them all....
+	std::cout << prev_range_new << std::endl;
+	std::cout << current_range_new << std::endl;
+	std::cout << next_range_new << std::endl;
+	//std::cout << prev_range->max << std::endl;
+	//std::cout << current_range->max << std::endl;
+	//std::cout << next_range->max << std::endl;
+	std::cout << std::endl;
+
+	//if (collider.getPosition().y > current_range_new[0].position.y + collider.getRadius() / 2 + 1) { // if (tank is under the ground)
+	//	return;
+	//}
+
+
+	//if (collider.getPosition().y > (600 - current_range->max) + collider.getRadius() / 2 + 1) { // if (tank is under the ground)
+	//	return;
+	//}
+
+	if (collider.getPosition().y < current_range_new){// - collider.getRadius() / 2 - 1) { // if (collision detected); TODO: 3 is the best magicnum out of them all....
 		collider.move(0, const_falling_speed);
 		tube.move(0, const_falling_speed);
 	}
 
-	else if (direction != 0) {
+	  if (direction != 0) {
 		float x1 = first_collision_point;
 		float x2 = second_collision_point;
-		float y1 = 600 - prev_range->max;
-		float y2 = 600 - next_range->max;
+		float y1 = prev_range_new;
+		float y2 = next_range_new;
 
 		float angle = atan2(y2 - y1, x2 - x1) * 180 / pi;	// y2 - y1 and x2 - x1 is the perpendicular line to the line formed out of terrain pixels exactly below our horizontal collision points. And then we just atan to get the angle.
 
@@ -132,15 +154,15 @@ void Player::move(const Terrain& terrain)
 		if (angle < -60.0f && direction == 1) return;
 
 		float new_pos_x = collider.getPosition().x + direction;		// every horizontal move is always 1px
-		current_range = &terrain.ranges[collider.getPosition().x];	// get the next vertical pixel range from terrain since we moved horizontally by 1px
-		float new_pos_y = 600 - current_range->max;					// set our new vertical position to the range's topmost pixel
+		current_range_new = terrain.getRangeNEW(collider.getPosition().x);	// get the next vertical pixel range from terrain since we moved horizontally by 1px
+		float new_pos_y = current_range_new;				// set our new vertical position to the range's topmost pixel
 
 		collider.setPosition(new_pos_x, new_pos_y);
 		collider.setRotation(angle);
 	}
 
 	tube.setPosition(collider.getPosition().x, collider.getPosition().y - 5);	//TODO remove magicnum
-	tube.setRotation(-45);		//TODO
+	//tube.setRotation(-45);		//TODO
 
 	body.setPosition(collider.getPosition());
 	body.setRotation(collider.getRotation());

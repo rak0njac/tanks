@@ -2,6 +2,7 @@
 #pragma once
 #include <vector>
 #include <SFML/Graphics.hpp>
+#include <unordered_map>
 
 // structure that represents
 struct Range {
@@ -23,18 +24,23 @@ public:
 	void destroy_circle(sf::Vector2i pos, int radius);
 	void groundFall();
 	void groundFallThreaded(int thread);
+	int getRangeNEW(int width);
+	void ground_fall_by_range(sf::VertexArray va);
 	Range* operator[](int);
 	Range* operator[](float);
 
 	sf::VertexArray vertices;
 	std::vector<Range> ranges;
+	sf::VertexArray NEW_vertices;
+	std::unordered_map<int, sf::VertexArray> NEW_vertices_vertical;
 
 private:
-	void displacement(float displace, float roughness);
+	void randomize(float roughness);
 	void applyRange();
 	void range_destroy_single(int x, int y);
 	void ray_destroy_multi(sf::Vector2f origin, float angle, float other_angle, float thickness);
 	sf::Texture terrainTexture;
+	void colorRange(sf::Color c);
 
 	bool hasFalling = false;
 	

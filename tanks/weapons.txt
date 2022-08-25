@@ -1,7 +1,7 @@
 Machine Gun:STANDARD
 {
 	speed:5
-	expl_size:10
+	expl_size:30
 	cooldown:0.3
 	proj_rad : 3
 
@@ -11,7 +11,7 @@ Machine Gun:STANDARD
 Big Gun:STANDARD
 {
 	speed:5
-	expl_size:40
+	expl_size:100
 	cooldown:0.3
 	proj_rad : 10
 }

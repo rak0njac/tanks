@@ -7,11 +7,13 @@ const sf::Time time_per_frame = sf::seconds(1.0f / 60.0f);
 Game::Game()
 {
 	window = new sf::RenderWindow(sf::VideoMode(800, 600), "tanks");
-	terrain = new Terrain("NULL");
+	terrain = new Terrain("assets\\ground.jpg");
 	hud = new HUD("assets\\Lato-Regular.ttf");
 	view.setCenter(window->getSize().x / 2, window->getSize().y / 2);
-	view.setSize(window->getSize().x, window->getSize().y * 0.75f);
-	view.setViewport(sf::FloatRect(0, 0, 1, 0.75f));
+	//view.setSize(window->getSize().x, window->getSize().y * 0.75f);
+	//view.setViewport(sf::FloatRect(0, 0, 1, 0.75f));
+	view.setSize(window->getSize().x, window->getSize().y);
+	view.setViewport(sf::FloatRect(0, 0, 1, 1));
 
 	window->setView(view);
 	//window->setFramerateLimit(60);
@@ -112,8 +114,20 @@ void Game::poll() {
 }
 
 void Game::render() {
+	sf::Vertex rectangle[] =
+	{
+		sf::Vertex(sf::Vector2f(0,0), sf::Color::Black),
+		sf::Vertex(sf::Vector2f(0,600), sf::Color::Blue),
+		sf::Vertex(sf::Vector2f(800,600), sf::Color::Blue),
+		sf::Vertex(sf::Vector2f(800,0), sf::Color::Black),
+	};
+
+
+
+
 	window->clear();
 	window->setView(view);
+	window->draw(rectangle, 4, sf::Quads);
 	// MOVE ALL DRAWINGS TO THEIR RESPECTIVE CLASSES
 	window->draw(*terrain);
 	for (int i = 0; i < res.players.size(); i++) {
@@ -125,7 +139,7 @@ void Game::render() {
 	}
 	//window->setView(hudView);
 	window->setView(window->getDefaultView());
-	window->draw(*hud);
+	//window->draw(*hud);
 	//
 	window->display();
 }

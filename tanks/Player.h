@@ -18,10 +18,10 @@ public:
 	void add_weapon(Weapon wep);
 	void change_weapon(int);
 	//void change_wep_abs(int);
-	void move(const Terrain& terrain);
+	void move(Terrain& terrain);
 	void move_tube(const sf::Vector2f& mousepos);
 
-	void logic(const Terrain& terrain, sf::Vector2f mv, const sf::Vector2f& mousepos,
+	void logic(Terrain& terrain, sf::Vector2f mv, const sf::Vector2f& mousepos,
 		GameResourceManager& grm);
 
 	//bool movingLeft = false;

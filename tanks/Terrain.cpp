@@ -49,7 +49,10 @@ Terrain::~Terrain()
 void Terrain::draw(sf::RenderTarget & target, sf::RenderStates states) const
 {
 	states.texture = &terrainTexture;
-	target.draw(vertices, states);
+	//for (auto& it : NEW_vertices_vertical) {
+	//	target.draw(it.second, states);
+	//}
+	target.draw(NEW_vertices, states);
 }
 
 Terrain::Terrain(const std::string & file) // file = image file for the texture
@@ -59,12 +62,12 @@ Terrain::Terrain(const std::string & file) // file = image file for the texture
 	//vArray.setPrimitiveType(sf::Quads);
 	//vArray.setPrimitiveType(sf::Quads);
 	vertices.resize(width * height); //4
-	for (int i = 1; i < width; i++) {
-		for (int j = 1; j < height; j++) {
+	for (int i = 0; i < width; i++) {
+		for (int j = 0; j < height; j++) {
 			//sf::Vertex* quad = &vArray[(i + j * width) * 4];
 			sf::Vertex* point = &vertices[(i + j * width)];
 
-			point->position = sf::Vector2f((i * xSize + 0.5f),(j * ySize + 0.5f)); //CHECK: zasto se ovde dodavalo +0.5f?
+			point->position = sf::Vector2f((i * xSize),(j * ySize)); //CHECK: zasto se ovde dodavalo +0.5f?
 			point->texCoords = sf::Vector2f(i * xSize*2, j * ySize*2);
 
 			/*quad[0].position = sf::Vector2f(i * xSize, j * ySize);
@@ -83,11 +86,11 @@ Terrain::Terrain(const std::string & file) // file = image file for the texture
 	ranges.resize(width);
 	for (int i = 0; i < ranges.size(); i++) {
 		ranges[i].min = 0;
-		ranges[i].max = height-1;
+		ranges[i].max = height;
 	}
-	displacement(5.f, 200.f);
+	randomize(100.f);
 	applyRange();
-
+	//colorRange(sf::Color::Red);
 }
 void Terrain::rayDestroy(sf::Vector2f origin, float angle,float thickness) {
 	
@@ -266,24 +269,35 @@ void Terrain::range_destroy_single(int x, int y) {
 	}
 	hasFalling = true;
 }
-void Terrain::displacement(float displace, float roughness) { 
+
+void Terrain::randomize(float roughness) { 
 	ranges[0].max = rng::getRangeInt(100,500);
 	ranges[width-1].max = rng::getRangeInt(100, 500);
 	std::queue<midpoint> q;
+
 	midpoint m;
 	m.left = 0;
 	m.right = width - 1;
 	m.randomness = roughness;
 	q.push(m);
+	//sf::VertexArray va;
 	while (q.size() != 0) {
 		midpoint n = q.front();
 		q.pop();
 		int center = (n.left + n.right) / 2;
 
 		ranges[center].max = (ranges[n.left].max + ranges[n.right].max) / 2;
-		ranges[center].max += rng::getRangeInt(-n.randomness, n.randomness);
+		ranges[center].max += rng::getRangeInt(n.randomness * -1, n.randomness);
 		if (ranges[center].max >= 600) ranges[center].max = 599;
 		if (ranges[center].max <0) ranges[center].max = 0;
+		sf::VertexArray va;
+
+		for (int i = ranges[center].max; i < height; i++) {
+			sf::Vertex v;
+			v.position = sf::Vector2f(center, i);
+			NEW_vertices.append(v);
+			va.append(v);
+		}
 
 		if (n.right - n.left > 2) {
 			midpoint left;
@@ -297,10 +311,25 @@ void Terrain::displacement(float displace, float roughness) {
 			right.randomness = floor(n.randomness / 2);
 			q.push(right);
 		}
+		NEW_vertices_vertical[center] = va;
 	}
 
+}
 
+void Terrain::ground_fall_by_range(sf::VertexArray va) {
+	for (int i = 0; i < va.getVertexCount(); i++) {
+		va[i].position.y++;
+	}
+}
 
+int Terrain::getRangeNEW(int width) {
+	//sf::VertexArray va = NEW_vertices_vertical[width];
+	//int max = 599;
+	//for (int i = 0; i < va.getVertexCount(); i++) {
+	//	if (va[i].position.y < max)
+	//		max = va[i].position.y;
+	//}
+	return NEW_vertices_vertical[width][0].position.y;
 }
 
 void Terrain::applyRange() { //makes pixels that aren't in the current range transparent
@@ -314,6 +343,17 @@ void Terrain::applyRange() { //makes pixels that aren't in the current range tra
 	}
 }
 
+void Terrain::colorRange(sf::Color c) {
+	for (int i = 0; i < ranges.size(); i++) {
+		for (int j = ranges[i].max; j >= ranges[i].max - 30; j--) {
+			int y = i + ((height - (j - 1)) * width);
+			if (y < 0) y = 0;
+			if (y >= width * height) y = width * height - 1;
+			vertices[y].color = c;
+		}
+	}
+}
+
 //void Terrain::groundFall() { //for multithreading ground
 //	std::thread th1(&Terrain::groundFallThreaded,this, 0);
 //	std::thread th2(&Terrain::groundFallThreaded, this, 1);
@@ -322,7 +362,7 @@ void Terrain::applyRange() { //makes pixels that aren't in the current range tra
 //	std::thread th5(&Terrain::groundFallThreaded, this, 4);
 //	std::thread th6(&Terrain::groundFallThreaded, this, 5);
 //	std::thread th7(&Terrain::groundFallThreaded, this, 6);
-//	std::thread th8(&Terrain::groundFallThreaded, this, 7);
+// std::thread th8(&Terrain::groundFallThreaded, this, 7);
 //	std::thread th9(&Terrain::groundFallThreaded, this, 8);
 //	std::thread th10(&Terrain::groundFallThreaded, this, 9);
 //	std::thread th11(&Terrain::groundFallThreaded, this, 10);
@@ -343,7 +383,18 @@ void Terrain::applyRange() { //makes pixels that aren't in the current range tra
 //}
 
 void Terrain::groundFall() {//makes each row of ground fall down 1 pixel
-	if (!hasFalling) return;
+	//if (!hasFalling) return;
+
+	//static int i = 0;
+	//static int j = ranges[i].max;
+
+	//if (i < ranges.size()) {
+	//	if (j >= 0) {
+	//		vertices[i - 1 * (height - j - 1)].color = sf::Color::Red;
+	//		j++;
+	//	}
+	//	i++;
+	//}
 
 	for (int i = 0; i < ranges.size(); i++) {
 		Range* current = &ranges[i];
@@ -354,8 +405,8 @@ void Terrain::groundFall() {//makes each row of ground fall down 1 pixel
 			Range* next = current->next;
 			if (current->min != 0) {
 				for (int j = current->min; j <= current->max; j++) {
-					int y = height - (j+1);
-					if (y >= 599 || y<0) continue;
+					int y = height - j;// (j - 1);
+					if (y > 599 || y<0) continue;
 					//std::swap(vArray[(i + y * width)], vArray[(i + (y + 1) * width)]);
 					/*sf::Vector2f temp = std::move(vArray[(i + y * width)].texCoords);
 					vArray[(i + y * width)].texCoords = std::move(vArray[(i + (y + 1) * width)].texCoords);
@@ -364,6 +415,9 @@ void Terrain::groundFall() {//makes each row of ground fall down 1 pixel
 					sf::Vertex& rising = vertices[(i + (y+1) * width)];
 					float x1 = falling.texCoords.x;
 					float y1 = falling.texCoords.y;
+					//auto c = falling.color;
+					//falling.color = rising.color;
+					//rising.color = c;
 					falling.texCoords.x = rising.texCoords.x;
 					falling.texCoords.y = rising.texCoords.y;
 					rising.texCoords.x = x1;
@@ -391,6 +445,7 @@ void Terrain::groundFall() {//makes each row of ground fall down 1 pixel
 
 Range * Terrain::operator[](int i)
 {
+
 	if (i < 0 || i >= width)
 		return nullptr;
 	return &ranges[i];
