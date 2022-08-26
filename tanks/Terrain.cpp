@@ -5,6 +5,7 @@
 #include <thread>
 #include "Random.h"
 #include <queue> 
+#include <iostream>
 
 const int screenWidth = 800;
 const int screenHeight = 600;
@@ -49,10 +50,10 @@ Terrain::~Terrain()
 void Terrain::draw(sf::RenderTarget & target, sf::RenderStates states) const
 {
 	states.texture = &terrainTexture;
-	//for (auto& it : NEW_vertices_vertical) {
-	//	target.draw(it.second, states);
-	//}
-	target.draw(NEW_vertices, states);
+	std::vector<sf::Vertex> vertices;
+	for (auto& it : horizontal_map_of_vertical_vertices) {
+		target.draw(it.second.data(), it.second.size(), sf::PrimitiveType::Points, states);
+	}
 }
 
 Terrain::Terrain(const std::string & file) // file = image file for the texture
@@ -88,7 +89,7 @@ Terrain::Terrain(const std::string & file) // file = image file for the texture
 		ranges[i].min = 0;
 		ranges[i].max = height;
 	}
-	randomize(100.f);
+	randomize(100);
 	applyRange();
 	//colorRange(sf::Color::Red);
 }
@@ -214,65 +215,179 @@ void Terrain::ray_destroy_multi(sf::Vector2f origin, float angle, float other_an
 	}
 }
 void Terrain::destroy_circle(sf::Vector2i pos, int radius) { 
-	//int quadPos = pos.x + pos.y * screenWidth;
+
+	//sf::CircleShape cs(radius);
+	//cs.setPosition((sf::Vector2f)pos);
+	//cs.setOrigin(cs.getLocalBounds().width / 2, cs.getLocalBounds().height / 2);
+	//cs.setPointCount(800);
+
+	//sf::VertexArray circle;
+
+	//for (int i = 0; i < NEW_vertices.getVertexCount(); i++) {
+	//	for (int j = 0; j < circle.getVertexCount(); j++) {
+	//		if (NEW_vertices[i].position == circle[i].position) {
+	//			delete &NEW_vertices[i];
+	//		}
+	//	}
+	//}
+
+#if 0
+	int pt_cnt = cs.getPointCount();
+	
+	for (int i = 0; i < pt_cnt; i++) {
+
+		sf::Vector2i first_point = (sf::Vector2i)cs.getTransform().transformPoint(cs.getPoint(i));
+		sf::Vector2i second_point = (sf::Vector2i)cs.getTransform().transformPoint(cs.getPoint(i + 1));
+		//sf::Vector2i point = (sf::Vector2i)cs.getTransform().transformPoint(cs.getPoint(i));
+		//sf::VertexArray vertical_new;
+		
+
+
+
+		//for (first_point.x; first_point.x <= second_point.x; first_point.x++) {
+			if (first_point.y > getRangeNEW(first_point.x) && second_point.y > getRangeNEW(second_point.x)) {
+				//while (first_point.x > second_point.x) {
+					std::cout << first_point.y << std::endl;
+					std::cout << getRangeNEW(first_point.x) << std::endl;
+					std::cout << std::endl;
+					//NEW_vertices_vertical[first_point.x][0].position.y = first_point.y;
+					//NEW_vertices_vertical[first_point.x][0].color = sf::Color::Red;
+					for (int j = first_point.y, z = 0; j < 600, z < NEW_vertices_vertical[first_point.x].getVertexCount(); j++, z++) {
+						NEW_vertices_vertical[first_point.x][z].position.y = j;
+						//sf::Vertex v(sf::Vector2f(first_point.x, j));
+						//v.color.a = 0;
+						//vertical_new.append(v);
+					}
+					//first_point.x++;
+				//}
+			}
+		//}
+		
+		//NEW_vertices_vertical[first_point.x] = vertical_new;
+	}
+
+#endif
+	//int quadPos = pos.x * pos.y;// *screenWidth;
 	//radius /= xSize * ySize;
-	pos.x /= xSize;
-	pos.y /= ySize;
+	//pos.x /= xSize;
+	//pos.y /= ySize;
+	//std::unordered_map<int, std::vector<int>> to_destroy;
+
 	int i = pos.x - radius;
 	if (i < 0) i = 0;
 	for (i; i < pos.x + radius && i < width; i++) {
 		int j = pos.y - radius;
 		if (j < 0) j = 0;
 		for (j; j < pos.y + radius && j < height; j++) {
-			sf::Vertex* point = &vertices[(i + j * width)];
+			//sf::Vertex* point = &NEW_vertices_vertical[i][j];
 			//if (point->color.a == 0) continue;
 
-			if (squarePointDistance(sf::Vector2f(pos.x,pos.y), point->position) < radius * radius) {
-				point->color.a = 0;
-				Range* current = &ranges[i];
-				range_destroy_single(i, j);
+			if (squarePointDistance(sf::Vector2f(pos.x,pos.y), sf::Vector2f(i,j)) < radius * radius) {
+				//point->color.a = 0;
+				//Range* current = &ranges[i];
+				//std::cout << i << std::endl;
+				//std::cout << j << std::endl;
+				//std::cout << std::endl;
+				new_destroy_single(i, j);
 			}
 			
 		}
 	}
+	//new_destroy_single(to_destroy);
 	hasFalling = true;
+}
+
+void Terrain::new_destroy_single(int x, int y) {
+
+	//SOLUTION: Convert_Global_Y_To_NewVertices_Local_Y_Based_On_X(int global_y, int x)
+
+	for (auto& i : horizontal_map_of_vertical_vertices[x]) {
+		if (i.position.y == y) {
+			i.position = sf::Vector2f(x, height + 1);
+		}
+	}
+
+	//horizontal_map_of_vertical_vertices[x][y].position = sf::Vector2f(x, height + 1);
+
+	//for (int i = 0; i < NEW_vertices_vertical[x].size(); i++) {
+	//	std::cout << NEW_vertices_vertical[x][i].position.y << std::endl;
+	//}
+	//int first_pixel_of_vertical_row_position = NEW_vertices_vertical[x][0].position.y;
+	//std::cout << y << std::endl;
+	//for (int i = 0; i < horizontal_map_of_vertical_vertices.size(); i++) {
+		////int size = NEW_vertices_vertical[i].size();
+		//for (int j = 0; j < horizontal_map_of_vertical_vertices[i].size(); j++) {
+		//	//int y = 600 - pixels[i][j] - size;
+		//	if (y < size && y > 0)
+		//		NEW_vertices_vertical[i].erase(NEW_vertices_vertical[i].begin() + y);
+		//}
+	//}
+
+	//for (int i = 0; i < pixels.size(); i++) {
+	//	int x = pixels[i].x;
+	//	int y = pixels[i].y;
+
+	//	std::cout << y << std::endl;
+	//	y = 600 - y - NEW_vertices_vertical[x].size();
+	//	std::cout << y << std::endl;
+	//	std::cout << std::endl;
+	//	//if (y < 300)
+	//	//	y = 0;
+	//	//y -= NEW_vertices_vertical[x].size();
+	//	//std::cout << y << std::endl;
+	//	//std::cout << std::endl;
+	//	if (y < NEW_vertices_vertical[x].size() && y > 0)
+	//		NEW_vertices_vertical[x][y].color.a = 0;//erase(NEW_vertices_vertical[x].begin() + y);
+	//}
+
+
+	//int max_y = NEW_vertices_vertical[x][0].position.y;
+	//for (int i = 0; i < max_y - 1; i++) {
+	//	//if (NEW_vertices_vertical[x][i].position.y == y) {
+	//	//	delete &NEW_vertices_vertical[x][i];
+	//	//	continue;
+	//	//}
+	//	if (NEW_vertices_vertical[x][i].position.y > y) {
+	//		NEW_vertices_vertical[x][i].position.y++;
+	//	}
+	//}
 }
 
 
 void Terrain::range_destroy_single(int x, int y) {
-	Range* current = (*this)[x];
-	while (current) {
-		Range* next = current->next;
-		int yet_another_height = height - 1 - y;
-		if (yet_another_height < current->max && yet_another_height > current->min) {
-			int temp = current->max;
-			current->max = yet_another_height - 1;
-			Range* insert = new Range();
-			insert->min = yet_another_height + 1;
-			insert->max = temp;
-			insert->next = current->next;
-			current->next = insert;
-			break;
-		}
-		if (yet_another_height == current->max) {
-			current->max--;
-			break;
-		}
-		if (yet_another_height == current->min && yet_another_height != 0) {
-			current->min--;
-			break;
-		}
-		if (!next) {
-			break;
-		}
-		current = next;
-	}
-	hasFalling = true;
+	//int current = getRangeNEW(x);
+	////while (current) {
+	//	int next = getRangeNEW(x+1);
+	//	int yet_another_height = height - 1 - y;
+	//	if (yet_another_height < current && yet_another_height > 0) {
+	//		int temp = current;
+	//		current = yet_another_height - 1;
+	//		Range* insert = new Range();
+	//		insert->min = yet_another_height + 1;
+	//		insert->max = temp;
+	//		insert->next = current->next;
+	//		current->next = insert;
+	//		break;
+	//	}
+	//	else if (yet_another_height == current) {
+	//		current--;
+	//		//break;
+	//	}
+	//	//else if (yet_another_height == current->min && yet_another_height != 0) {
+	//	//	current->min--;
+	//	//	break;
+	//	//}
+	//	//else if (!next) {
+	//	//	break;
+	//	//}
+	//	else current = next;
+	////}
+	//hasFalling = true;
 }
 
 void Terrain::randomize(float roughness) { 
 	ranges[0].max = rng::getRangeInt(100,500);
-	ranges[width-1].max = rng::getRangeInt(100, 500);
+	ranges[width - 1].max = rng::getRangeInt(100, 500);
 	std::queue<midpoint> q;
 
 	midpoint m;
@@ -290,13 +405,16 @@ void Terrain::randomize(float roughness) {
 		ranges[center].max += rng::getRangeInt(n.randomness * -1, n.randomness);
 		if (ranges[center].max >= 600) ranges[center].max = 599;
 		if (ranges[center].max <0) ranges[center].max = 0;
-		sf::VertexArray va;
+		std::vector<sf::Vertex> va;
+		//if(center == 797 || center == 798 || center == 799)
+		std::cout << center << std::endl;
 
-		for (int i = ranges[center].max; i < height; i++) {
+		for (int i = ranges[center].max; i <= height; i++) {
+			
 			sf::Vertex v;
 			v.position = sf::Vector2f(center, i);
-			NEW_vertices.append(v);
-			va.append(v);
+			va.push_back(v);
+			//va[i] = v;
 		}
 
 		if (n.right - n.left > 2) {
@@ -311,7 +429,7 @@ void Terrain::randomize(float roughness) {
 			right.randomness = floor(n.randomness / 2);
 			q.push(right);
 		}
-		NEW_vertices_vertical[center] = va;
+		horizontal_map_of_vertical_vertices[center] = va;
 	}
 
 }
@@ -323,13 +441,12 @@ void Terrain::ground_fall_by_range(sf::VertexArray va) {
 }
 
 int Terrain::getRangeNEW(int width) {
-	//sf::VertexArray va = NEW_vertices_vertical[width];
-	//int max = 599;
-	//for (int i = 0; i < va.getVertexCount(); i++) {
-	//	if (va[i].position.y < max)
-	//		max = va[i].position.y;
-	//}
-	return NEW_vertices_vertical[width][0].position.y;
+	int max = height;
+	for (auto& v : horizontal_map_of_vertical_vertices[width]) {
+		if (v.position.y < max)
+			max = v.position.y;
+	}
+	return max;
 }
 
 void Terrain::applyRange() { //makes pixels that aren't in the current range transparent

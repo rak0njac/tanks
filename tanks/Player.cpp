@@ -119,29 +119,29 @@ void Player::move(Terrain& terrain)
 	const Range* current_range = &terrain.ranges[collider.getPosition().x];		//the range between the first and second collision point (used for moving, not important for collision)
 	const Range* next_range = &terrain.ranges[second_collision_point];
 
-	std::cout << prev_range_new << std::endl;
-	std::cout << current_range_new << std::endl;
-	std::cout << next_range_new << std::endl;
+	//std::cout << prev_range_new << std::endl;
+	//std::cout << current_range_new << std::endl;
+	//std::cout << next_range_new << std::endl;
 	//std::cout << prev_range->max << std::endl;
 	//std::cout << current_range->max << std::endl;
 	//std::cout << next_range->max << std::endl;
-	std::cout << std::endl;
+	//std::cout << std::endl;
 
 	//if (collider.getPosition().y > current_range_new[0].position.y + collider.getRadius() / 2 + 1) { // if (tank is under the ground)
 	//	return;
 	//}
 
 
-	//if (collider.getPosition().y > (600 - current_range->max) + collider.getRadius() / 2 + 1) { // if (tank is under the ground)
-	//	return;
-	//}
+	if (collider.getPosition().y > current_range_new + collider.getRadius() / 2 + 1) { // if (tank is under the ground)
+		return;
+	}
 
-	if (collider.getPosition().y < current_range_new){// - collider.getRadius() / 2 - 1) { // if (collision detected); TODO: 3 is the best magicnum out of them all....
+	if (collider.getPosition().y < current_range_new - collider.getRadius() / 2 - 1) { // if (collision detected); TODO: 3 is the best magicnum out of them all....
 		collider.move(0, const_falling_speed);
 		tube.move(0, const_falling_speed);
 	}
 
-	  if (direction != 0) {
+	else {
 		float x1 = first_collision_point;
 		float x2 = second_collision_point;
 		float y1 = prev_range_new;

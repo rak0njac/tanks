@@ -31,13 +31,15 @@ public:
 
 	sf::VertexArray vertices;
 	std::vector<Range> ranges;
-	sf::VertexArray NEW_vertices;
-	std::unordered_map<int, sf::VertexArray> NEW_vertices_vertical;
+
+	std::vector<sf::Vertex> vertical_vertices; //int is global Y position of sf::Vertex
+	std::unordered_map<int, std::vector<sf::Vertex>> horizontal_map_of_vertical_vertices; //int is global X position of given vertical_vertices value
 
 private:
 	void randomize(float roughness);
 	void applyRange();
 	void range_destroy_single(int x, int y);
+	void new_destroy_single(int x, int y);
 	void ray_destroy_multi(sf::Vector2f origin, float angle, float other_angle, float thickness);
 	sf::Texture terrainTexture;
 	void colorRange(sf::Color c);

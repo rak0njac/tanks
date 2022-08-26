@@ -102,57 +102,20 @@ void Projectile::move(Terrain & terrain) {
 	//npos.y = cpos.y + speed * (sin(cur_angle * pi / 180));
 	shape->setPosition(npos);
 	movementVector.y += drop_rate * frame;
-	//cur_angle = atan2(movementVector.y, movementVector.x) * 180/pi;
-	//shape->setRotation(cur_angle);
-	/*if (cpos.x >aa < 800) {
-		const Range* cur = &terrain.ranges[cpos.x];
-		while (cur) {
-			if (600 - cpos.y >=  cur->min && 600 - cpos.y <= cur->max) {
-				terrain.destroy(sf::Vector2i(npos.x, npos.y), expl_rad);
-				destroyed = true;
-				speed = 0;
-				shape->setFillColor(sf::Color::Transparent);
-				//break;
-			}
-			cur = cur->next;
 
+
+	int cur = terrain.getRangeNEW(cpos.x);
+		if (cpos.y >= 599 || cpos.y >= cur) {
+			terrain.destroy_circle(sf::Vector2i(npos.x, npos.y), expl_rad);
+			destroyed = true;
+			speed = 0;
+			shape->setFillColor(sf::Color::Transparent);
 		}
-	}*/
-	//int fac = cpos.x > npos.x ? -1 : 1;
-	//float step = 1;
-	// 
-	// 	   USEFUL CODE - BE CAREFUL!!!
-	for(int i = 0; i<=(speed+ static_cast<sf::CircleShape*>(shape)->getRadius())&& !destroyed;i++) {
-		Range* cur = terrain[cpos.x];
-		while (cur) {
-			if (600 - (cpos.y) >= cur->min && 600 - (cpos.y) <= cur->max) {
-				terrain.destroy_circle(sf::Vector2i(npos.x, npos.y), expl_rad);
-				destroyed = true;
-				speed = 0;
-				shape->setFillColor(sf::Color::Transparent);
-				break;
-			}
-			cur = cur->next;
-		}
-		cpos.x = cpos.x + 1.0 * (cos(cur_angle * pi / 180.0f));
-		cpos.y = cpos.y + 1.0 * (sin(cur_angle * pi / 180.0f));
-	}
+	//CHECK WHY IS THIS USEFUL
+	//cpos.x = cpos.x + 1.0 * (cos(cur_angle * pi / 180.0f));
+	//cpos.y = cpos.y + 1.0 * (sin(cur_angle * pi / 180.0f));
 
-	//use this and make it more accurate
-	/*float cx = cpos.x - (proj_rad / 2) * (cos(cur_angle * pi / 180.0f));
-	float cy = cpos.y - (proj_rad / 2) * (sin(cur_angle * pi / 180.0f));
-	
-	int step = movementVector.x > 0 ? 1 : -1;
-	for (int i = cx; i < 800 && i>0 && !destroyed; i += step) {
-		Range* cur = terrain[cx];
-		while (cur) {
-
-			cur = cur->next;
-		}
-	}*/
-
-	if (npos.x < 0 || npos.x >= 800 || npos.y <-2000 || npos.y>=600 ) {
+	if (npos.x < 0 || npos.x >= 799) {
 		destroyed = true;
 	}
-	//cur_angle -= 10;
 }

@@ -144,6 +144,7 @@
     <ClInclude Include="Game.h" />
     <ClInclude Include="GameResourceManager.h" />
     <ClInclude Include="HUD.h" />
+    <ClInclude Include="MyVertexArray.h" />
     <ClInclude Include="Parser.h" />
     <ClInclude Include="Player.h" />
     <ClInclude Include="Projectile.h" />
