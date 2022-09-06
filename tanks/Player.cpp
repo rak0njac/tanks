@@ -1,4 +1,5 @@
 #include "Player.h"
+#include "Game.h"
 #include <stdio.h>
 #include <cmath>
 #include <iostream>
@@ -75,6 +76,7 @@ void Player::draw(sf::RenderTarget &target, sf::RenderStates states) const
 
 void Player::logic(Terrain& terrain, sf::Vector2f mv, const sf::Vector2f& mousepos, GameResourceManager& grm)
 {
+	//std::cout << mousepos.x << " " << mousepos.y << std::endl;
 	if (firing) shoot(grm.projectiles);
 	move_tube(mousepos);
 	move(terrain);
@@ -110,14 +112,14 @@ void Player::move(Terrain& terrain)
 	int first_collision_point = collider.getTransform().transformPoint(collider.getPoint(3)).x;
 	int second_collision_point = collider.getTransform().transformPoint(collider.getPoint(2)).x;
 
-	int prev_range_new = terrain.getRangeNEW(first_collision_point);
-	int current_range_new = terrain.getRangeNEW(collider.getPosition().x);
-	int next_range_new = terrain.getRangeNEW(second_collision_point);
+	int prev_range_new = terrain.get_top_vertex_position_of_vertical_array_at_width(first_collision_point);
+	int current_range_new = terrain.get_top_vertex_position_of_vertical_array_at_width(collider.getPosition().x);
+	int next_range_new = terrain.get_top_vertex_position_of_vertical_array_at_width(second_collision_point);
 
 	//TODO make ranges obsolete and figure out a better way
-	const Range* prev_range = &terrain.ranges[first_collision_point];			//the range of vertical pixels from terrain at the location of the first collision point
-	const Range* current_range = &terrain.ranges[collider.getPosition().x];		//the range between the first and second collision point (used for moving, not important for collision)
-	const Range* next_range = &terrain.ranges[second_collision_point];
+	//const Range* prev_range = &terrain.ranges[first_collision_point];			//the range of vertical pixels from terrain at the location of the first collision point
+	//const Range* current_range = &terrain.ranges[collider.getPosition().x];		//the range between the first and second collision point (used for moving, not important for collision)
+	//const Range* next_range = &terrain.ranges[second_collision_point];
 
 	//std::cout << prev_range_new << std::endl;
 	//std::cout << current_range_new << std::endl;
@@ -154,7 +156,7 @@ void Player::move(Terrain& terrain)
 		if (angle < -60.0f && direction == 1) return;
 
 		float new_pos_x = collider.getPosition().x + direction;		// every horizontal move is always 1px
-		current_range_new = terrain.getRangeNEW(collider.getPosition().x);	// get the next vertical pixel range from terrain since we moved horizontally by 1px
+		current_range_new = terrain.get_top_vertex_position_of_vertical_array_at_width(collider.getPosition().x);	// get the next vertical pixel range from terrain since we moved horizontally by 1px
 		float new_pos_y = current_range_new;				// set our new vertical position to the range's topmost pixel
 
 		collider.setPosition(new_pos_x, new_pos_y);

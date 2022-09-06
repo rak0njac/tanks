@@ -104,8 +104,8 @@ void Projectile::move(Terrain & terrain) {
 	movementVector.y += drop_rate * frame;
 
 
-	int cur = terrain.getRangeNEW(cpos.x);
-		if (cpos.y >= 599 || cpos.y >= cur) {
+	//int cur = terrain.get_top_vertex_position_of_vertical_array_at_width(cpos.x);
+		if (cpos.y >= 599 || terrain.contains_vertex_at(cpos.x, cpos.y)) {
 			terrain.destroy_circle(sf::Vector2i(npos.x, npos.y), expl_rad);
 			destroyed = true;
 			speed = 0;

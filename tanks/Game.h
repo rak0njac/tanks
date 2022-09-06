@@ -7,6 +7,7 @@
 #include <list>
 #include "GameResourceManager.h"
 #include "Parser.h"
+#include "TerrainEngine.h"
 class Game
 {
 public:
@@ -29,11 +30,11 @@ private:
 	sf::RenderWindow *window;
 	sf::View view;
 	sf::View hudView;
-	Terrain* terrain;
+	//Terrain* terrain;
 	HUD* hud;
 	sf::Vector2i mousepos;
 	std::vector<Weapon> all_weapons;
-	
+	TerrainEngine te;
 
 
 
