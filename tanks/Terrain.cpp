@@ -36,6 +36,25 @@ float squarePointDistance(sf::Vector2f pos1, sf::Vector2f pos2) {
 	float c = a * a + b * b;
 	return c;
 }
+
+ sf::VertexArray genMesh(int mRadius, int mCenterX, int mCenterY) {
+	 int segments = mRadius * 4;
+	 float step = 6.283185f / segments;
+	float angle = 0.0f;
+	sf::VertexArray vertices;
+
+	vertices.resize(segments);
+	for (int i = 0; i < segments; ++i, angle += step) {
+		float vertX = mCenterX + cosf(angle) * mRadius;
+		float vertY = mCenterY + sinf(angle) * mRadius;
+		auto vert = sf::Vertex(sf::Vector2f(vertX, vertY));
+		vert.color = sf::Color::Red;
+		vertices[i] = vert;
+	}
+
+	return vertices;
+}
+
 Terrain::Terrain()
 {
 	
@@ -48,16 +67,35 @@ Terrain::~Terrain()
 
 
 
+
 void Terrain::draw(sf::RenderTarget & target, sf::RenderStates states) const
 {
 	states.texture = &terrainTexture;
-	//const sf::Vertex* ptr = horizontal_map_of_vertical_vertices[0][0];
-    //std::vector<std::vector<sf::Vertex>> vertices;
-	//target.draw(legacy_vertices, states);
+
+
+
+	
+
+
 	for (auto& it : horizontal_map_of_vertical_vertices) {
 		const sf::Vertex* v = &it->at(0);
 		target.draw(v, 600, sf::PrimitiveType::Points, states);
 	}
+
+
+
+
+
+	sf::VertexArray va;
+	for (int i = 0; i < boundaries.size(); i++) {
+		sf::Vertex v(sf::Vector2f(i, boundaries[i]));
+		v.color = sf::Color::Red;
+		va.append(v);
+	}
+
+	//target.draw(vaglobal);
+	target.draw(va);
+	target.draw(genMesh(25, 400, 200));
 }
 
 Terrain::Terrain(const std::string & file) // file = image file for the texture
@@ -65,10 +103,16 @@ Terrain::Terrain(const std::string & file) // file = image file for the texture
 	horizontal_map_of_vertical_vertices = std::vector<std::vector<sf::Vertex>*>(799);
 	terrainTexture.loadFromFile(file);
 	terrainTexture.setRepeated(true);
-	line_to_displace = std::vector<int>(width);
+	boundaries = std::vector<int>(width);
 	hasFalling = false;
 
 	randomize(100);
+
+
+
+
+	 
+	//vaglobal.resize(801 * 601);
 }
 
 Terrain::Terrain(std::vector<std::vector<sf::Vertex>> neu) 
@@ -77,29 +121,6 @@ Terrain::Terrain(std::vector<std::vector<sf::Vertex>> neu)
 	
 }
 
-
-//void Terrain::ray_destroy_multi(sf::Vector2f origin, float angle, float other_angle, float thickness)
-//{
-//	//const float precision = 1.0f;
-//	//sf::Vector2f cline = origin;
-//	//for (int i = 0; i < round(thickness / 2); i++) {
-//	//	cline.x = origin.x + 1 * i * cos(other_angle*pi / 180);
-//	//	cline.y = origin.y + 1 * i * sin(other_angle*pi / 180);
-//	//	while (cline.y >= 0 && cline.y < height && cline.x >= 0 && cline.x < width) {
-//
-//	//		//int x = round(cline.x) + round(cline.y)*(width);
-//	//		int x = round(cline.x) + round(cline.y)*(width);
-//	//		x = flatten(0, height*width - 1, x);
-//	//		sf::Vertex* point = &vertices[x];
-//	//		if (point->color.a != 0) {
-//	//			point->color.a = 0;
-//	//			range_destroy_single(round(cline.x), round(cline.y));
-//	//		}
-//	//		cline.x += precision * cos(angle*pi / 180);
-//	//		cline.y += precision * sin(angle*pi / 180);
-//	//	}
-//	//}
-//}
 
 void Terrain::destroy_circle(sf::Vector2i pos, int radius) { 
 	if (hasFalling) {
@@ -122,28 +143,20 @@ void Terrain::destroy_circle(sf::Vector2i pos, int radius) {
 }
 
 void Terrain::new_destroy_single(int x, int y) {
+	if (boundaries[x] < y)
+		boundaries[x] = y;
 
-	if ((height - y) < horizontal_map_of_vertical_vertices[x]->size()) {
-		if (line_to_displace[x] < y)
-			line_to_displace[x] = y;
-		//horizontal_map_of_vertical_vertices[x][height - y].color.a = 0;
-		horizontal_map_of_vertical_vertices.at(x)->at(y).position.y = height - 1;
+	//horizontal_map_of_vertical_vertices.at(x)->at(y).position.y = height - 1;  // bugs
+
+	for (auto& v : *horizontal_map_of_vertical_vertices.at(x)) {   //works correctly
+		if (v.position.y == y)
+			v.position.y = height - 1;
 	}
-
-
-	//auto& v = horizontal_map_of_vertical_vertices[x];
-	//for (int i = 0; i < v.size(); i++) {
-	//	if (v.at(i).position.y == y) {
-	//		if(line_to_displace[x] < y)
-	//			line_to_displace[x] = y;
-	//		v.at(i).position = sf::Vector2f(x, height + 1);
-	//	}
-	//}
 }
 
 void Terrain::randomize(float roughness) { 
-	line_to_displace.at(0) = rng::getRangeInt(100, 500);
-	line_to_displace.at(width - 1) = rng::getRangeInt(100, 500);
+	boundaries.at(0) = rng::getRangeInt(100, 500);
+	boundaries.at(width - 1) = rng::getRangeInt(100, 500);
 
 	std::queue<midpoint> q; //queue
 
@@ -157,16 +170,16 @@ void Terrain::randomize(float roughness) {
 		q.pop();
 
 		int center = (n.left + n.right) / 2;
-		line_to_displace.at(center) = (line_to_displace.at(n.left) + line_to_displace.at(n.right)) / 2;
-		line_to_displace.at(center) -= (n.randomness * -1, n.randomness);
-		if (line_to_displace.at(center) >= 600) line_to_displace.at(center) = 599;
-		if (line_to_displace.at(center) <0) line_to_displace.at(center) = 0;
+		boundaries.at(center) = (boundaries.at(n.left) + boundaries.at(n.right)) / 2;
+		boundaries.at(center) -= (n.randomness * -1, n.randomness);
+		if (boundaries.at(center) >= 600) boundaries.at(center) = 599;
+		if (boundaries.at(center) <0) boundaries.at(center) = 0;
 		std::vector<sf::Vertex>* va = new std::vector<sf::Vertex>(height + 1, sf::Vertex(sf::Vector2f(center, height - 1)));
 
-		for (int i = line_to_displace[center]; i < height; i++) {
+		for (int i = boundaries[center]; i < height; i++) {
 			
 			sf::Vertex v;
-			//if (i >= line_to_displace[center]) {
+			//if (i >= boundaries[center]) {
 				v.position = sf::Vector2f(center, i);
 				v.texCoords = sf::Vector2f(center * 2, i * 2);
 			//}
@@ -191,32 +204,23 @@ void Terrain::randomize(float roughness) {
 		}
 
 		//legacy_vertices.append(sf::Vertex(sf::Vector2f(center, height + 1)));
-		//legacy_vertices.append(sf::Vertex(sf::Vector2f(center, line_to_displace[center])));
+		//legacy_vertices.append(sf::Vertex(sf::Vector2f(center, boundaries[center])));
 
 		horizontal_map_of_vertical_vertices[center] = va;
 	}
-	for (int i : line_to_displace) {
+	for (int i : boundaries) {
 		//std::cout << i << std::endl;
 	}
 }
 
 bool Terrain::contains_vertex_at(int i, int j) {
-	int actual_height = horizontal_map_of_vertical_vertices[i]->at(j).position.y;
-	if (actual_height < height - 1)
+	if (boundaries[i] < j)
 		return true;
 	return false;
-
-
-	//auto& v = horizontal_map_of_vertical_vertices[width];
-	//for (int i = v->size() - 1; i > 0; i--) {
-	//	if (v->at(i).position.y == height)
-	//		return true;
-	//}
-	//return false;
 }
 
 int Terrain::get_top_vertex_position_of_vertical_array_at_width(int width) {
-	return line_to_displace.at(width);
+	return boundaries.at(width);
 }
 
 bool Terrain::contains_vertex_that_needs_to_fall(int width) {
@@ -229,32 +233,56 @@ bool Terrain::contains_vertex_that_needs_to_fall(int width) {
 }
 
 void Terrain::fall_vertex(std::unordered_set<int> ttf) {
+	//std::cout << ttf.size() << std::endl;
+	static std::unordered_set<int> temp;
+
+	if (ttf.empty()) {
+		regenerate_terrain(temp);
+		temp.clear();
+		hasFalling = false;
+		return;
+	}
+
+	if (temp.empty()) {
+		temp = ttf;
+	}
+
+	//regenerate_terrain(temp);
+
 	for (auto& i : ttf) {
-		for (int j = line_to_displace.at(i); j >= 0; j--) {
+
+		std::vector <sf::Vertex*> vert_array;
+		for (int j = boundaries.at(i) - 1; j >= 0; j--) {
 			sf::Vertex* v = &horizontal_map_of_vertical_vertices.at(i)->at(j);
-			v->color = sf::Color::Red;
-			if (v->position.y == line_to_displace.at(i)) {
-				//ttf.erase(i);
+			//v->color = sf::Color::Red;
+			if (v->position.y < height - 1) {
+				vert_array.push_back(v);
+			}
+		}
+
+		if (vert_array.empty()) {
+			terrain_to_fall.erase(i);
+			continue;
+		}
+
+		for (auto& v : vert_array) {
+
+			if (v->position.y >= boundaries.at(i) && v->position.y < height - 1) {
+				terrain_to_fall.erase(i);
+				boundaries.at(i) = vert_array.at(vert_array.size() - 1)->position.y;
+				vert_array.clear();
 				break;
 			}
-			if (v->position.y < 598) {
-
-				horizontal_map_of_vertical_vertices.at(i)->at(j).position.y++;// = horizontal_map_of_vertical_vertices.at(i)->at(j + 1);
-			}
+			v->position.y++;
 		}
 	}
 }
 
-void Terrain::regenerate_terrain(std::unordered_set<int> ttf) {
-
-	for (int k : ttf) {
-		int max = height;
-		auto v = horizontal_map_of_vertical_vertices[k];
-		for (auto& j : *v) {
-			if (j.position.y < max)
-				max = j.position.y;
+void Terrain::regenerate_terrain(std::unordered_set<int> t) {
+	for (auto& i : t) {
+		for (int j = height; j >= boundaries.at(i); j--) {
+			horizontal_map_of_vertical_vertices.at(i)->at(j).position.y = j;
 		}
-		line_to_displace.at(k) = max;
 	}
 }
 
@@ -262,4 +290,16 @@ void Terrain::logic() {
 
 	if (hasFalling)
 		fall_vertex(terrain_to_fall);
+
+
+	//sf::VertexArray valocal;
+	//valocal.resize(801 * 601);
+	//int count = 0;
+	//for (int i = 0; i < horizontal_map_of_vertical_vertices.size(); i++) {
+	//	for (int j = 0; j < horizontal_map_of_vertical_vertices.at(i)->size(); j++, count++) {
+	//		valocal[count] = horizontal_map_of_vertical_vertices.at(i)->at(j);
+	//	}
+	//}
+	//vaglobal = valocal;
+	//valocal.clear();
 }

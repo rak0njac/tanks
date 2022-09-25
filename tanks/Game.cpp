@@ -18,6 +18,7 @@ Game::Game()
 	view.setViewport(sf::FloatRect(0, 0, 1, 1));
 
 	window->setView(view);
+	//window.setVerticalSyncEnabled(true)
 	//window->setFramerateLimit(60);
 
 	res.players.push_back(new Player());
@@ -34,30 +35,6 @@ Game::Game()
 	hudView.setCenter(400, 1000);
 	hudView.setViewport(sf::FloatRect(0.f, 0.25f, 1, 1));*/
 }
-
-//void Game::init_weapons() {
-//	Weapon* w = new Weapon(WeaponType::STANDARD, 8, 0.1, 10);
-//	w->proj_rad = 3;
-//	w->drop_rate = 10;
-//	res.weapon_pool.push_back(w);
-//
-//	w =  new Weapon(WeaponType::STANDARD, 50, 3, 3);
-//	w->proj_rad = 7;
-//	res.weapon_pool.push_back(new Weapon());
-//	res.weapon_pool.push_back(w);
-//
-//	w = new Weapon(WeaponType::STANDARD, 9, 0,60);
-//	w->proj_rad = 3;
-//	res.weapon_pool.push_back(w);
-//
-//	w = new Weapon(WeaponType::STANDARD, 9, 0, 5);
-//	w->proj_rad = 3;
-//	w->drop_rate = 2;
-//	res.weapon_pool.push_back(w);
-//	for (int i = 0; i < res.weapon_pool.size(); i++) {
-//		res.players[0]->add_wep(*res.weapon_pool[i]);
-//	}
-//}
 
 Game::~Game()
 {
@@ -80,7 +57,7 @@ void Game::run()
 		time_since_update += tick.restart();
 		if (time_since_update >= time_per_frame) {
 			poll();
-			logic();
+			//logic();
 			time_since_update = sf::Time::Zero;// -= time_per_frame;
 		}
 		//std::cout << time_since_update.asMilliseconds() << std::endl;
@@ -116,6 +93,8 @@ void Game::poll() {
 }
 
 void Game::render() {
+	logic();
+
 	sf::Vertex rectangle[] =
 	{
 		sf::Vertex(sf::Vector2f(0,0), sf::Color::Black),
@@ -194,6 +173,8 @@ void Game::logic() {
 	for (Projectile* i: res.projectiles) {
 		i->move(*te.main_terrain);
 	}
+
+	//render();
 }
 
 void Game::handlePress(sf::Keyboard::Key key, bool pressed)

@@ -3,6 +3,7 @@
 #include <SFML/Graphics.hpp>
 #include <unordered_map>
 #include <unordered_set>
+#include <set>
 
 float squarePointDistance(sf::Vector2f pos1, sf::Vector2f pos2);
 
@@ -15,7 +16,6 @@ public:
 	virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const;
 	void destroy_circle(sf::Vector2i pos, int radius);
 	void logic();
-	void LEGACY_groundFallThreaded(int thread);
 	bool contains_vertex_at(int width, int height);
 	int get_top_vertex_position_of_vertical_array_at_width(int width);
 	bool contains_vertex_that_needs_to_fall(int width);
@@ -31,8 +31,8 @@ private:
 	sf::Texture terrainTexture;
 	std::vector<sf::Vertex*> arr;
 	std::unordered_set<int> terrain_to_fall;
-	void regenerate_terrain(std::unordered_set<int> ttf);
-	std::vector<int> line_to_displace;
-
+	void regenerate_terrain(std::unordered_set<int> t);
+	std::vector<int> boundaries;
+	sf::VertexArray vaglobal;
 	bool hasFalling = false;
 };

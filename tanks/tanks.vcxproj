@@ -133,6 +133,7 @@
   <ItemGroup>
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="GameResourceManager.cpp" />
+    <ClCompile Include="HorizontalVertexArray.cpp" />
     <ClCompile Include="HUD.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Parser.cpp" />
@@ -142,11 +143,15 @@
     <ClCompile Include="ObsoleteTerrain.cpp" />
     <ClCompile Include="Terrain.cpp" />
     <ClCompile Include="TerrainEngine.cpp" />
+    <ClCompile Include="VerticalVertexArray.cpp" />
     <ClCompile Include="Weapon.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="BoundingVertexArray.h" />
+    <ClInclude Include="consts.h" />
     <ClInclude Include="Game.h" />
     <ClInclude Include="GameResourceManager.h" />
+    <ClInclude Include="HorizontalVertexArray.h" />
     <ClInclude Include="HUD.h" />
     <ClInclude Include="MyVertexArray.h" />
     <ClInclude Include="Parser.h" />
@@ -156,6 +161,7 @@
     <ClInclude Include="ObsoleteTerrain.h" />
     <ClInclude Include="Terrain.h" />
     <ClInclude Include="TerrainEngine.h" />
+    <ClInclude Include="VerticalVertexArray.h" />
     <ClInclude Include="Weapon.h" />
   </ItemGroup>
   <ItemGroup>
