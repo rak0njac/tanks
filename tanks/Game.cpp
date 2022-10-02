@@ -2,14 +2,13 @@
 #include <iostream>
 const sf::Time time_per_frame = sf::seconds(1.0f / 60.0f);
 //sf::Clock tick;
-
+//NewTerrain terrain("assets/ground.jpg");
 
 Game::Game()
 {
 	window = new sf::RenderWindow(sf::VideoMode(800, 600), "tanks");
 	//TerrainEngine te;
-	te.main_terrain = new Terrain("assets\\ground.jpg");
-	//terrain = new Terrain("assets\\ground.jpg");
+	terrain = new NewTerrain("assets/ground.jpg");
 	hud = new HUD("assets\\Lato-Regular.ttf");
 	view.setCenter(window->getSize().x / 2, window->getSize().y / 2);
 	//view.setSize(window->getSize().x, window->getSize().y * 0.75f);
@@ -110,10 +109,9 @@ void Game::render() {
 	window->setView(view);
 	window->draw(rectangle, 4, sf::Quads);
 	// MOVE ALL DRAWINGS TO THEIR RESPECTIVE CLASSES
-	window->draw(*te.main_terrain);
-	for (auto& a : te.other_terrains) {
-		window->draw(*a);
-	}
+    //te.main_terrain->terrain.prepare_for_drawing();
+	//window->draw(*te.main_terrain);
+	window->draw(*terrain);
 	for (int i = 0; i < res.players.size(); i++) {
 		window->draw(*res.players[i]);
 	}
@@ -126,10 +124,11 @@ void Game::render() {
 	//window->draw(*hud);
 	//
 	window->display();
+
 }
 
 void Game::logic() {
-	te.logic();
+	//terrain.logic();
 	//for (auto& a : te.other_terrains) {
 	//	window->draw(*a);
 	//}
@@ -145,9 +144,9 @@ void Game::logic() {
 		grm.players[0]->shoot(grm.projectiles);
 		clickClock.restart();
 	}*/
-	//terrain->logic();
+	terrain->logic();
 	for (int i = 0; i < res.players.size(); i++) {
-		res.players[i]->logic(*te.main_terrain, sf::Vector2f(0,0), window->mapPixelToCoords(mousepos, view), res);
+		res.players[i]->logic(*terrain, sf::Vector2f(0,0), window->mapPixelToCoords(mousepos, view), res);
 	}
 	//for (Projectile* p : res.projectiles) {
 	//	if (p->destroyed) {
@@ -166,12 +165,12 @@ void Game::logic() {
 			it = res.projectiles.erase(it);
 		}
 		else {
-			(*it)->move(*te.main_terrain);
+			(*it)->move(*terrain);
 			it++;
 		}
 	}
 	for (Projectile* i: res.projectiles) {
-		i->move(*te.main_terrain);
+		//i->move(terrain);
 	}
 
 	//render();

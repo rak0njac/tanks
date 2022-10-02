@@ -1,6 +1,6 @@
 #pragma once
 #include <SFML/Graphics.hpp>
-#include "Terrain.h"
+#include "NewTerrain.h"
 
 enum class Projectile_type {
 	Rect,
@@ -19,8 +19,8 @@ public:
 	Projectile(sf::Vector2f p, float angle, float sp, float explr, float rad);
 	~Projectile();
 	void draw(sf::RenderTarget & target, sf::RenderStates states) const;
-	void moveLazor(Terrain & terrain);
-	void move(Terrain & terrain);
+	void moveLazor(NewTerrain & terrain);
+	void move(NewTerrain & terrain);
 	void update();
 
 	sf::Vector2f movementVector;

@@ -1,9 +1,9 @@
 #pragma once
 #include <random>
-namespace rng {
+namespace rnd {
 
 	float getRange(float x, float y);
-	int getRangeInt(int x, int y);
+	int get_int(int x, int y);
 	float zorandom();
 }
 

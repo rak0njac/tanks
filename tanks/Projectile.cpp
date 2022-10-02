@@ -1,6 +1,5 @@
 #include "Projectile.h"
 #include <math.h>
-#include "Terrain.h"
 const float pi = std::acos(-1);
 constexpr float frame = 1.f / 60.f;
 
@@ -76,7 +75,7 @@ void Projectile::draw(sf::RenderTarget & target, sf::RenderStates states) const
 	target.draw(*shape, states);
 }
 
-void Projectile::moveLazor(Terrain & terrain) {
+void Projectile::moveLazor(NewTerrain & terrain) {
 	if (time.getElapsedTime().asSeconds() >= 0.01f) {
 		destroyed = true;
 		return;
@@ -86,7 +85,7 @@ void Projectile::moveLazor(Terrain & terrain) {
 
 }
 
-void Projectile::move(Terrain & terrain) {
+void Projectile::move(NewTerrain & terrain) {
 	if (destroyed) return;
 	if (type == Projectile_type::Laser) {
 		Projectile::moveLazor(terrain);
@@ -102,20 +101,23 @@ void Projectile::move(Terrain & terrain) {
 	//npos.y = cpos.y + speed * (sin(cur_angle * pi / 180));
 	shape->setPosition(npos);
 	movementVector.y += drop_rate * frame;
-
+    if (npos.x < 5 || npos.x >= 794) {
+        destroyed = true;
+    }
 
 	//int cur = terrain.get_top_vertex_position_of_vertical_array_at_width(cpos.x);
-		if (cpos.y >= 599 || terrain.contains_vertex_at(cpos.x, cpos.y)) {
-			terrain.destroy_circle(sf::Vector2i(npos.x, npos.y), expl_rad);
-			destroyed = true;
-			speed = 0;
-			shape->setFillColor(sf::Color::Transparent);
-		}
+    for(auto& t : terrain.get_terrains()){
+        if (cpos.y >= 599 || t.contains_vertex_at(npos)){ //t.at(npos.x)->top() < npos.y) {
+            terrain.destroy_circle(sf::Vector2i(npos.x - movementVector.x, npos.y), expl_rad);
+            destroyed = true;
+            speed = 0;
+            shape->setFillColor(sf::Color::Transparent);
+        }
+    }
+
 	//CHECK WHY IS THIS USEFUL
 	//cpos.x = cpos.x + 1.0 * (cos(cur_angle * pi / 180.0f));
 	//cpos.y = cpos.y + 1.0 * (sin(cur_angle * pi / 180.0f));
 
-	if (npos.x < 0 || npos.x >= 799) {
-		destroyed = true;
-	}
+
 }

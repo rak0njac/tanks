@@ -1,13 +1,13 @@
 #pragma once
 #include <SFML/Graphics.hpp>
-#include "Terrain.h"
 #include "Player.h"
 #include "HUD.h"
 #include "Projectile.h"
 #include <list>
 #include "GameResourceManager.h"
 #include "Parser.h"
-#include "TerrainEngine.h"
+#include "NewTerrain.h"
+
 class Game
 {
 public:
@@ -34,8 +34,7 @@ private:
 	HUD* hud;
 	sf::Vector2i mousepos;
 	std::vector<Weapon> all_weapons;
-	TerrainEngine te;
-
+    NewTerrain* terrain;
 
 
 };

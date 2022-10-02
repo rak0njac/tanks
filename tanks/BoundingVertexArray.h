@@ -1,13 +1,15 @@
 #pragma once
 #include <vector>
+#include <unordered_map>
 #include <SFML/Graphics.hpp>
 
-class BoundingVertexArray {
+class BoundingVertexArray : public sf::Drawable{
 public:
 	BoundingVertexArray();
 	~BoundingVertexArray();
-	void insert(sf::Vector2f& position);
-	bool exists_vertex_at(sf::Vector2f& position);
+	void insert(const sf::Vector2f& position);
+	bool exists(const sf::Vector2f& position);
+    virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const;
 private:
-	std::vector<sf::Vertex> vec;
+    std::vector<sf::Vertex> vec;
 };
