@@ -75,7 +75,7 @@ void Projectile::draw(sf::RenderTarget & target, sf::RenderStates states) const
 	target.draw(*shape, states);
 }
 
-void Projectile::moveLazor(NewTerrain & terrain) {
+void Projectile::moveLazor(TerrainEngine & terrain) {
 	if (time.getElapsedTime().asSeconds() >= 0.01f) {
 		destroyed = true;
 		return;
@@ -85,7 +85,7 @@ void Projectile::moveLazor(NewTerrain & terrain) {
 
 }
 
-void Projectile::move(NewTerrain & terrain) {
+void Projectile::move(TerrainEngine & terrain) {
 	if (destroyed) return;
 	if (type == Projectile_type::Laser) {
 		Projectile::moveLazor(terrain);
@@ -101,13 +101,14 @@ void Projectile::move(NewTerrain & terrain) {
 	//npos.y = cpos.y + speed * (sin(cur_angle * pi / 180));
 	shape->setPosition(npos);
 	movementVector.y += drop_rate * frame;
-    if (npos.x < 5 || npos.x >= 794) {
+    if (npos.x < 5 || npos.x >= const_screen_width - 5) {
         destroyed = true;
     }
 
 	//int cur = terrain.get_top_vertex_position_of_vertical_array_at_width(cpos.x);
-    for(auto& t : terrain.get_terrains()){
-        if (cpos.y >= 599 || t.contains_vertex_at(npos)){ //t.at(npos.x)->top() < npos.y) {
+    for(auto& t : terrain.get_all_terrains()){
+        //TODO: check for tunneling
+        if (cpos.y >= const_screen_height - 1 || t.contains_vertex_at(npos)){ //t.at(npos.x)->top() < npos.y) {
             terrain.destroy_circle(sf::Vector2i(npos.x - movementVector.x, npos.y), expl_rad);
             destroyed = true;
             speed = 0;

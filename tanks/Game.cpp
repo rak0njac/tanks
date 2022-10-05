@@ -2,13 +2,13 @@
 #include <iostream>
 const sf::Time time_per_frame = sf::seconds(1.0f / 60.0f);
 //sf::Clock tick;
-//NewTerrain terrain("assets/ground.jpg");
+//TerrainEngine terrain("assets/ground.jpg");
 
 Game::Game()
 {
-	window = new sf::RenderWindow(sf::VideoMode(800, 600), "tanks");
+	window = new sf::RenderWindow(sf::VideoMode(const_screen_width, const_screen_height), "tanks");
 	//TerrainEngine te;
-	terrain = new NewTerrain("assets/ground.jpg");
+	terrain = new TerrainEngine("assets/ground.jpg");
 	hud = new HUD("assets\\Lato-Regular.ttf");
 	view.setCenter(window->getSize().x / 2, window->getSize().y / 2);
 	//view.setSize(window->getSize().x, window->getSize().y * 0.75f);
@@ -56,7 +56,7 @@ void Game::run()
 		time_since_update += tick.restart();
 		if (time_since_update >= time_per_frame) {
 			poll();
-			//logic();
+			logic();
 			time_since_update = sf::Time::Zero;// -= time_per_frame;
 		}
 		//std::cout << time_since_update.asMilliseconds() << std::endl;
@@ -92,14 +92,14 @@ void Game::poll() {
 }
 
 void Game::render() {
-	logic();
+	//logic();
 
 	sf::Vertex rectangle[] =
 	{
 		sf::Vertex(sf::Vector2f(0,0), sf::Color::Black),
-		sf::Vertex(sf::Vector2f(0,600), sf::Color::Blue),
-		sf::Vertex(sf::Vector2f(800,600), sf::Color::Blue),
-		sf::Vertex(sf::Vector2f(800,0), sf::Color::Black),
+		sf::Vertex(sf::Vector2f(0,const_screen_height), sf::Color::Blue),
+		sf::Vertex(sf::Vector2f(const_screen_width,const_screen_height), sf::Color::Blue),
+		sf::Vertex(sf::Vector2f(const_screen_width,0), sf::Color::Black),
 	};
 
 

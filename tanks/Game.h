@@ -6,7 +6,7 @@
 #include <list>
 #include "GameResourceManager.h"
 #include "Parser.h"
-#include "NewTerrain.h"
+#include "terrain/TerrainEngine.h"
 
 class Game
 {
@@ -34,7 +34,7 @@ private:
 	HUD* hud;
 	sf::Vector2i mousepos;
 	std::vector<Weapon> all_weapons;
-    NewTerrain* terrain;
+    TerrainEngine* terrain;
 
 
 };

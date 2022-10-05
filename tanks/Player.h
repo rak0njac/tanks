@@ -3,7 +3,7 @@
 #include "Weapon.h"
 #include <list>
 #include "GameResourceManager.h"
-#include "NewTerrain.h"
+#include "terrain/TerrainEngine.h"
 
 //class Game;
 const float const_falling_speed = 2.0f;
@@ -19,11 +19,11 @@ public:
 	void add_weapon(Weapon wep);
 	void change_weapon(int);
 	//void change_wep_abs(int);
-	void move(NewTerrain& terrain);
+	void move(TerrainEngine& terrain);
 	void move_tube(const sf::Vector2f& mousepos);
 
-	void logic(NewTerrain& terrain, sf::Vector2f mv, const sf::Vector2f& mousepos,
-		GameResourceManager& grm);
+	void logic(TerrainEngine& terrain, sf::Vector2f mv, const sf::Vector2f& mousepos,
+               GameResourceManager& grm);
 
 	//bool movingLeft = false;
 	//bool movingRight = false;

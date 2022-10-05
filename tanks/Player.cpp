@@ -74,7 +74,7 @@ void Player::draw(sf::RenderTarget &target, sf::RenderStates states) const
 	target.draw(tube, states);
 }
 
-void Player::logic(NewTerrain& terrain, sf::Vector2f mv, const sf::Vector2f& mousepos, GameResourceManager& grm)
+void Player::logic(TerrainEngine& terrain, sf::Vector2f mv, const sf::Vector2f& mousepos, GameResourceManager& grm)
 {
 	//std::cout << mousepos.x << " " << mousepos.y << std::endl;
 	if (firing) shoot(grm.projectiles);
@@ -88,19 +88,19 @@ void Player::move_tube(const sf::Vector2f& mousepos) {
 	tube.setRotation(tube_angle);
 }
 
-void Player::move(NewTerrain& terrain)
+void Player::move(TerrainEngine& terrain)
 {
 	// EDGE CASES TODO: refactor
 	if (collider.getPosition().x < 10) {
 		direction = 0;
 		collider.setPosition(10, collider.getPosition().y);
 	}
-	if (collider.getPosition().x > 790) {
+	if (collider.getPosition().x > const_screen_width - 10) {
 		direction = 0;
-		collider.setPosition(790, collider.getPosition().y);
+		collider.setPosition(const_screen_width - 10, collider.getPosition().y);
 	}
-	if (collider.getPosition().y > 600) {
-		collider.setPosition(collider.getPosition().x, 600);
+	if (collider.getPosition().y > const_screen_height) {
+		collider.setPosition(collider.getPosition().x, const_screen_height);
 	}
 
 	// COLLISION POINTS
@@ -109,9 +109,9 @@ void Player::move(NewTerrain& terrain)
 	int first_collision_point = collider.getTransform().transformPoint(collider.getPoint(3)).x;
 	int second_collision_point = collider.getTransform().transformPoint(collider.getPoint(2)).x;
 
-	int prev_range_new = terrain.get_terrain()->at(first_collision_point)->top();// terrain.get_top_vertex_position_of_vertical_array_at_width(first_collision_point);
-	int current_range_new = terrain.get_terrain()->at(collider.getPosition().x)->top();// terrain.get_top_vertex_position_of_vertical_array_at_width(collider.getPosition().x);
-	int next_range_new = terrain.get_terrain()->at(second_collision_point)->top(); // terrain.get_top_vertex_position_of_vertical_array_at_width(second_collision_point);
+	int prev_range_new = terrain.get_main_terrain()->at(first_collision_point)->top();// terrain.get_top_vertex_position_of_vertical_array_at_width(first_collision_point);
+	int current_range_new = terrain.get_main_terrain()->at(collider.getPosition().x)->top();// terrain.get_top_vertex_position_of_vertical_array_at_width(collider.getPosition().x);
+	int next_range_new = terrain.get_main_terrain()->at(second_collision_point)->top(); // terrain.get_top_vertex_position_of_vertical_array_at_width(second_collision_point);
 
 
 	if (collider.getPosition().y > current_range_new + collider.getRadius() / 2 + 1) { // if (tank is under the ground)
@@ -136,7 +136,7 @@ void Player::move(NewTerrain& terrain)
 		if (angle < -60.0f && direction == 1) return;
 
 		float new_pos_x = collider.getPosition().x + direction;		// every horizontal move is always 1px
-		current_range_new = terrain.get_terrain()->at(collider.getPosition().x)->top(); // terrain.get_top_vertex_position_of_vertical_array_at_width(collider.getPosition().x);	// get the next vertical pixel range from terrain since we moved horizontally by 1px
+		current_range_new = terrain.get_main_terrain()->at(collider.getPosition().x)->top(); // terrain.get_top_vertex_position_of_vertical_array_at_width(collider.getPosition().x);	// get the next vertical pixel range from terrain since we moved horizontally by 1px
 		float new_pos_y = current_range_new;				// set our new vertical position to the range's topmost pixel
 
 		collider.setPosition(new_pos_x, new_pos_y);
