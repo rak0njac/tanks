@@ -10,15 +10,17 @@ public:
     NewVerticalLine(const std::vector<sf::Vertex>& vertices_to_move, const int& bottom, const int& top);
     ~NewVerticalLine();
     void push(const int& count); //number of pixels to add to the _top
+    void push(sf::Vertex& p_top); //number of pixels to add to the _top
     void pop(int count); //number of pixels to delete from the _top
     int top(); //get _top pixel position
     int bottom(); //get _bottom pixel position
     void move(const int& num_of_pixels, std::string direction = "up"); //Move all vertices by *num_of_pixels* pixels. > 0 for move up, < 0 for move down.
     virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const;
-    std::array<sf::Vertex, 2> * get_vector();
+    std::array<sf::Vertex*, 2> * get_vector();
     void set_color(const sf::Color& color);
     void clear();
     int count();
+    sf::Vector2f get_tex_coords(int index);
 
     bool contains_vertex_at(float d);
 
@@ -27,6 +29,6 @@ public:
 private:
     sf::Vertex _bottom;
     sf::Vertex _top;
-    std::array<sf::Vertex, 2> drawer;
+    std::array<sf::Vertex*, 2> drawer;
     int horizontal_position;
 };

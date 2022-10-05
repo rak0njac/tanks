@@ -67,7 +67,6 @@ int TerrainChunk::count() {
 
 void TerrainChunk::move(const int &num_pixels, TerrainChunk &array, std::string direction) {
     int cnt = 0;
-    //std::cout << "Count: " << cnt << std::endl;
     for(int i = 0; i < vec.size(); i++){
         if(vec.at(i) != nullptr && vec.at(i)->count()> 0){
             if(vec.at(i)->bottom() < array.at(i)->top()){
@@ -75,14 +74,12 @@ void TerrainChunk::move(const int &num_pixels, TerrainChunk &array, std::string 
                 cnt++;
             }
             else{
-                //std::cout << "Main terrain top: " << array.at(i)->top() << std::endl;
-                //std::cout << "Falling terrain top: " << vec.at(i)->top() << std::endl;
                 array.at(i)->push(array.at(i)->top() - vec.at(i)->top());
+                //array.at(i)->push(*vec.at(i)->get_vector()->at(0)); //TODO: Use this
                 vec.at(i)->clear();
             }
         }
     }
-    //std::cout << std::endl;
     if(cnt == 0){
         is_falling = false;
     }

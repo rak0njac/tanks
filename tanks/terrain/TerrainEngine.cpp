@@ -50,12 +50,15 @@ TerrainEngine::TerrainEngine(const std::string& texture_filename)
 	randomize(20); //ideally between 10 and 50
     TerrainChunk hva;
 
-    for(int i = 50; i < 200; i++){
-        NewVerticalLine* vva = new NewVerticalLine(i, 150, 20);
-        hva.push(i, vva);
+    if(const_debug_enabled){
+        for(int i = 50; i < 200; i++){
+            NewVerticalLine* vva = new NewVerticalLine(i, 150, 20);
+            hva.push(i, vva);
+        }
     }
 
     va.resize(const_screen_width * const_screen_height);
+    va.setPrimitiveType(sf::PrimitiveType::Lines);
 
     falling_terrains.emplace_back(hva);
 }
@@ -110,7 +113,9 @@ void TerrainEngine::destroy_circle(sf::Vector2f& pos_lower, sf::Vector2f& pos_up
         //if the current terrain has a vertex at the upper half circle position, create a new terrain chunk from that position to the current terrain's top position
         if(vva->contains_vertex_at(pos_upper.y)){
             NewVerticalLine* new_vva_upper = new NewVerticalLine(pos_upper.x, pos_upper.y, vva->top());
-            //new_vva_upper->set_color(sf::Color::Red);
+            if(const_debug_enabled){
+                new_vva_upper->set_color(sf::Color::Red);
+            }
 
             //TODO: make it not add in the first place if no vertices are needed, instead of adding and then deleting later
             if(new_vva_upper->count() > 0){
@@ -200,7 +205,7 @@ void TerrainEngine::logic() {
             for(int i = 0; i < const_screen_width; i++){
                 if(hva.at(i) != nullptr){
                     for(auto& vertex : *hva.at(i)->get_vector()){
-                        va.append(vertex);
+                        va.append(*vertex);
                     }
                 }
             }
@@ -209,7 +214,7 @@ void TerrainEngine::logic() {
         for(int i = 0; i < const_screen_width; i++){
             if(main_terrain.at(i) != nullptr){
                 for(auto& vertex : *main_terrain.at(i)->get_vector()){
-                    va.append(vertex);
+                    va.append(*vertex);
                 }
             }
         }
