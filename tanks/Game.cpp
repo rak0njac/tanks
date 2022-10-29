@@ -8,7 +8,7 @@ Game::Game()
 {
 	window = new sf::RenderWindow(sf::VideoMode(const_screen_width, const_screen_height), "tanks");
 	//TerrainEngine te;
-	terrain = new TerrainEngine("assets/ground.jpg");
+	terrain = new TerrainEngine("assets/ground3.jpg");
 	hud = new HUD("assets\\Lato-Regular.ttf");
 	view.setCenter(window->getSize().x / 2, window->getSize().y / 2);
 	//view.setSize(window->getSize().x, window->getSize().y * 0.75f);

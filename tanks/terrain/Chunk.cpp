@@ -1,21 +1,21 @@
-#include "TerrainChunk.h"
+#include "Chunk.h"
 
-TerrainChunk::TerrainChunk()
+Chunk::Chunk()
         :is_falling(false){
     vec.resize(const_screen_width);
 }
 
-TerrainChunk::~TerrainChunk() = default;
+Chunk::~Chunk() = default;
 
-void TerrainChunk::push(const int &position, NewVerticalLine* new_vec) {
+void Chunk::push(const int &position, VerticalLine* new_vec) {
     vec.at(position) = new_vec;
 }
 
-void TerrainChunk::pop(const int &position) {
+void Chunk::pop(const int &position) {
 
 }
 
-void TerrainChunk::draw(sf::RenderTarget &target, sf::RenderStates states) const {
+void Chunk::draw(sf::RenderTarget &target, sf::RenderStates states) const {
     for(auto& vva : vec){
         if(vva != nullptr){
             vva->draw(target, states);
@@ -23,12 +23,12 @@ void TerrainChunk::draw(sf::RenderTarget &target, sf::RenderStates states) const
     }
 }
 
-NewVerticalLine* TerrainChunk::at(const int &position) {
+VerticalLine* Chunk::at(const int &position) {
     //if(position >= vec.size()) return nullptr;
     return vec.at(position);
 }
 
-bool TerrainChunk::contains_vertex_at(const sf::Vector2f &position) {
+bool Chunk::contains_vertex_at(const sf::Vector2f &position) {
     auto vva = at(position.x);
     if(vva != nullptr && vva->count() > 0){
         if(position.y >= vva->top() && position.y <= vva->bottom())
@@ -48,16 +48,19 @@ bool TerrainChunk::contains_vertex_at(const sf::Vector2f &position) {
 //    return false;
 //}
 
-void TerrainChunk::tidy() {
+void Chunk::tidy() {
+    int index = 0;
     for(auto & i : vec){
         if(i != nullptr && i->count() == 0){
+            //std::cout << "Tidier found empty NVL at " << index << " and is thus declaring it nullptr and deleting." << std::endl;
             i = nullptr;
             delete i;
         }
+        index++;
     }
 }
 
-int TerrainChunk::count() {
+int Chunk::count() {
     int cnt = 0;
     for(auto& vva : vec){
         if (vva != nullptr && vva->count() > 0) cnt++;
@@ -65,7 +68,7 @@ int TerrainChunk::count() {
     return cnt;
 }
 
-void TerrainChunk::move(const int &num_pixels, TerrainChunk &array, std::string direction) {
+void Chunk::move(const int &num_pixels, Chunk &array, std::string direction) {
     int cnt = 0;
     for(int i = 0; i < vec.size(); i++){
         if(vec.at(i) != nullptr && vec.at(i)->count()> 0){
@@ -74,9 +77,11 @@ void TerrainChunk::move(const int &num_pixels, TerrainChunk &array, std::string 
                 cnt++;
             }
             else{
-                array.at(i)->push(array.at(i)->top() - vec.at(i)->top());
-                //array.at(i)->push(*vec.at(i)->get_vector()->at(0)); //TODO: Use this
-                vec.at(i)->clear();
+                array.at(i)->push(*vec.at(i)->get_vector()); //TODO: Use this
+                //std::cout << "NVL at " << i << " pushed to main terrain and cleared. ";
+                vec.at(i) = nullptr;
+                delete vec.at(i);
+                //std::cout << "Deleted!" << std::endl;
             }
         }
     }
@@ -85,7 +90,7 @@ void TerrainChunk::move(const int &num_pixels, TerrainChunk &array, std::string 
     }
 }
 
-void TerrainChunk::push(TerrainChunk &array) {
+void Chunk::push(Chunk &array) {
 //    for(int i = 0; i < vec.size(); i++){
 //        if(vec.at(i) != nullptr){
 //            array.at(i)->push(array.at(i)->top() - vec.at(i)->top());

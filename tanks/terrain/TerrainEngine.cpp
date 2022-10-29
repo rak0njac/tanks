@@ -48,19 +48,18 @@ TerrainEngine::TerrainEngine(const std::string& texture_filename)
 	texture.setRepeated(true);
 
 	randomize(20); //ideally between 10 and 50
-    TerrainChunk hva;
 
     if(const_debug_enabled){
+        Chunk hva;
         for(int i = 50; i < 200; i++){
-            NewVerticalLine* vva = new NewVerticalLine(i, 150, 20);
+            VerticalLine* vva = new VerticalLine(i, 150, 20);
             hva.push(i, vva);
         }
+        falling_terrains.emplace_back(hva);
     }
 
     va.resize(const_screen_width * const_screen_height);
     va.setPrimitiveType(sf::PrimitiveType::Lines);
-
-    falling_terrains.emplace_back(hva);
 }
 
 void TerrainEngine::destroy_circle(sf::Vector2i pos_projectile, int radius) {
@@ -75,7 +74,8 @@ void TerrainEngine::destroy_circle(sf::Vector2i pos_projectile, int radius) {
 
     auto& lower = half_circle.at(1);
 
-    TerrainChunk hva_upper;
+    Chunk hva_upper;
+    tidy();
 
     for(int i = 0, cur = 0; i < lower.size(); i++){
         auto& pos_lower = lower.at(i).position; //position of current lower half circle vertex
@@ -90,38 +90,68 @@ void TerrainEngine::destroy_circle(sf::Vector2i pos_projectile, int radius) {
             pos_upper.y = const_screen_height - 1;
         }
 
+        int index = 0;
+            //std::cout << "Number of falling terrain chunks: " << falling_terrains.size() << std::endl;
         //iterate through all terrain chunks
-        for(auto& j : falling_terrains){
-            destroy_circle(pos_lower, pos_upper, j, hva_upper);
-        }
         destroy_circle(pos_lower, pos_upper, main_terrain, hva_upper);
+        for(auto& j : falling_terrains){
+            if(const_debug_enabled){
+                //std::cout << std::endl;
+                //std::cout << "Currently operating on terrain chunk at index: " << index << " for position " << pos_lower.x << std::endl;
+            }
+            destroy_circle(pos_lower, pos_upper, j, hva_upper);
+            index++;
+        }
+        if(const_debug_enabled) {}
+            //std::cout << "Currently operating on main terrain for position " << pos_lower.x << std::endl;
+
     }
     hva_upper.is_falling = true;
     if(hva_upper.count() > 0)
         falling_terrains.emplace_back(hva_upper);
 
-    tidy();
     //std::cout << falling_terrains.size() << std::endl;
+
+    for(int i = 0; i < const_screen_width; i++){
+        for(int j = 0; j < falling_terrains.size(); j++){
+//            std::cout << std::endl;
+//            std::cout << "************** REPORT :: terrain chunk at index " << j << std::endl;
+//            std::cout << std::endl;
+//            if(falling_terrains.at(j).at(i) == nullptr){
+//                std::cout << "************** REPORT :: x position " << i << " is nullptr" << std::endl;
+//            }
+//            else{
+//                for(auto& v : *falling_terrains.at(j).at(i)->get_vector()){
+//                    std::cout << "************** REPORT :: vertex x position: " << v.position.x << std::endl;
+//                    std::cout << "************** REPORT :: vertex y position: " << v.position.y << std::endl;
+//                }
+//            }
+        }
+
+        //std::cout << std::endl;
+        //std::cout << "************** REPORT :: main terrain" << std::endl;
+        //std::cout << std::endl;
+        if(main_terrain.at(i) == nullptr){
+            //std::cout << "************** REPORT :: x position " << i << " is nullptr" << std::endl;
+        }
+        else{
+            for(auto& v : *main_terrain.at(i)->get_vector()){
+                //std::cout << "************** REPORT :: vertex x position: " << v.position.x << std::endl;
+                //std::cout << "************** REPORT :: vertex y position: " << v.position.y << std::endl;
+            }
+        }
+    }
 }
 
 //TODO clean this shit!!! learn about inline functions
-void TerrainEngine::destroy_circle(sf::Vector2f& pos_lower, sf::Vector2f& pos_upper, TerrainChunk& terrain_chunk, TerrainChunk& new_terrain_chunk_upper) {
+void TerrainEngine::destroy_circle(sf::Vector2f& pos_lower, sf::Vector2f& pos_upper, Chunk& terrain_chunk, Chunk& new_terrain_chunk_upper) {
     auto vva = terrain_chunk.at(pos_lower.x);
-
     if(vva != nullptr){
-
-        //if the current terrain has a vertex at the upper half circle position, create a new terrain chunk from that position to the current terrain's top position
         if(vva->contains_vertex_at(pos_upper.y)){
-            NewVerticalLine* new_vva_upper = new NewVerticalLine(pos_upper.x, pos_upper.y, vva->top());
-            if(const_debug_enabled){
-                new_vva_upper->set_color(sf::Color::Red);
-            }
+            VerticalLine* new_vva_upper = new VerticalLine(pos_upper.y, vva);
 
-            //TODO: make it not add in the first place if no vertices are needed, instead of adding and then deleting later
-            if(new_vva_upper->count() > 0){
+            if(1){//new_vva_upper->count() > 0){
                 new_terrain_chunk_upper.push(pos_upper.x, new_vva_upper);
-
-                //if it also has a vertex at the lower half circle position, remove the right number of pixels from the original terrain chunk
                 if(vva->contains_vertex_at(pos_lower.y)){
                     vva->pop(pos_lower.y - vva->top());
                 }
@@ -140,7 +170,7 @@ void TerrainEngine::destroy_circle(sf::Vector2f& pos_lower, sf::Vector2f& pos_up
         }
 
         //if it doesn't have neither upper half nor lower half circle position vertices, but has some inbetween, delete all of those
-        else if(vva->is_between(pos_lower.y, pos_upper.y)){
+        if(vva->is_between(pos_lower.y, pos_upper.y)){
             vva->clear();
         }
     }
@@ -156,7 +186,7 @@ void TerrainEngine::randomize(int roughness) {
     sf::Vector2i prev;
     sf::Vector2i next = sf::Vector2i(0, midpoint);
 
-    TerrainChunk hva;
+    Chunk hva;
 
     while(generating){
         prev = next;
@@ -189,7 +219,7 @@ void TerrainEngine::randomize(int roughness) {
         for(int j = 0; j < (x2 - x1); j++){
             y1 += step;
             sf::Vector2f ver(x1 + j, y1);
-            hva.push(x1 + j, new NewVerticalLine(x1 + j, const_screen_height, y1));
+            hva.push(x1 + j, new VerticalLine(x1 + j, const_screen_height, y1));
         }
     }
     main_terrain = hva;
@@ -205,7 +235,7 @@ void TerrainEngine::logic() {
             for(int i = 0; i < const_screen_width; i++){
                 if(hva.at(i) != nullptr){
                     for(auto& vertex : *hva.at(i)->get_vector()){
-                        va.append(*vertex);
+                        va.append(vertex);
                     }
                 }
             }
@@ -214,7 +244,7 @@ void TerrainEngine::logic() {
         for(int i = 0; i < const_screen_width; i++){
             if(main_terrain.at(i) != nullptr){
                 for(auto& vertex : *main_terrain.at(i)->get_vector()){
-                    va.append(*vertex);
+                    va.append(vertex);
                 }
             }
         }
@@ -229,15 +259,16 @@ void TerrainEngine::logic() {
 
 }
 
-TerrainChunk* TerrainEngine::get_main_terrain() {
+Chunk* TerrainEngine::get_main_terrain() {
     return &main_terrain;
 }
 
 void TerrainEngine::tidy() {
     int cnt = 0;
-    std::vector<TerrainChunk> new_falling_terrains;
+    std::vector<Chunk> new_falling_terrains;
     for(auto & falling_terrain : falling_terrains){
         falling_terrain.tidy();
+        //std::cout << "TerrainEngine tidier finished, current FT count is: " << falling_terrain.count() << std::endl;
         if(falling_terrain.count() == 0){
             cnt++;
         }
@@ -248,9 +279,9 @@ void TerrainEngine::tidy() {
     falling_terrains = new_falling_terrains;
 }
 
-std::vector<TerrainChunk> TerrainEngine::get_all_terrains() {
+std::vector<Chunk> TerrainEngine::get_all_terrains() {
     //TODO: optimize
-    std::vector<TerrainChunk> vec = falling_terrains;
+    std::vector<Chunk> vec = falling_terrains;
     vec.emplace_back(main_terrain);
     return vec;
 }

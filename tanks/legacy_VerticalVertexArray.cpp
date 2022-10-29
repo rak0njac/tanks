@@ -74,6 +74,8 @@ void legacy_VerticalVertexArray::clear() {
 }
 
 int legacy_VerticalVertexArray::count() {
+    if(vec.empty())
+        return 0;
     return vec.size();
 }
 
