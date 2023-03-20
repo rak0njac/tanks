@@ -19,83 +19,45 @@ VerticalLine::VerticalLine(const int& horizontal_position, const int& vertical_p
     drawer.emplace_back(_top);
 }
 
-void VerticalLine::push(const int& count)
-{
-    auto& _top = drawer.back();
-    _top.position.y -= count;
-    _top.texCoords.y -= count; // preserves texture coordinates
-}
+//void VerticalLine::push(const int& count)
+//{
+//    auto& _top = drawer.back();
+//    _top.position.y -= count;
+//    _top.texCoords.y -= count; // preserves texture coordinates
+//}
 
 void VerticalLine::pop(int p_count)
 {
     if(p_count < 1) return;
 
-    int old_top = drawer.back().position.y;
     auto new_top = drawer.back().position.y + p_count;
-    int cnt = 0;
 
-    for(int i = 0; i < drawer.size(); ++i){
-        if(drawer.at(i).position.y < new_top){
-            cnt++;
-        }
-    }
 
-    if(cnt >= drawer.size()){
-        clear();
-        return;
-    }
-
-    for(int i = 0; i < cnt - 1; i++){
+    while (drawer.size() > 2 && drawer.at(drawer.size() - 2).position.y < new_top) {
+        int to_remove = (drawer.back().position.y - drawer.at(drawer.size() - 2).position.y) * -1;
+        p_count -= to_remove;
         drawer.pop_back();
     }
 
     drawer.back().position.y = new_top;
     drawer.back().texCoords.y += p_count; // preserves texture coordinates
-    drawer.at(1).texCoords.y = drawer.at(1).position.y; //HACK
 }
 
-void VerticalLine::pop_from_bottom(int p_count)
+void VerticalLine::pop_from_bottom(int new_bottom)
 {
-    if(p_count < 1) return;
-    //std::cout << p_count << std::endl;
+    auto old_bottom = drawer.at(0).position.y;
+    auto p_count = old_bottom - new_bottom;
 
-    auto new_bottom = drawer.front().position.y - p_count;
-    int cnt = 0;
+    if (p_count < 1) return;
 
-    for(int i = 0; i < drawer.size(); ++i){
-        if(drawer.at(i).position.y > new_bottom){
-            cnt++;
-        }
-    }
-
-    if(cnt >= drawer.size()){
-        clear();
-        return;
-    }
-
-    for(int i = 0; i < cnt - 1; ++i){
-        drawer.erase(drawer.begin());
+    while (drawer.size() > 2 && drawer.at(2).position.y > new_bottom) {
+        int to_remove = (drawer.front().position.y - drawer.at(1).position.y);
+        p_count -= to_remove;
+        drawer.erase(drawer.begin(), drawer.begin() + 2);
     }
 
     drawer.front().position.y = new_bottom;
     drawer.front().texCoords.y -= p_count; // preserves texture coordinates
-
-
-
-//    auto& _top = drawer.back();
-//    auto& _next = drawer.at(1);
-//    auto& _bottom = drawer.front();
-//
-//    while(_bottom.position.y - p_count <= _next.position.y && &_next != &_top){
-//        p_count -= _bottom.position.y - _next.position.y;
-//        drawer.erase(drawer.begin());
-//
-//        _bottom = drawer.back();
-//        _next = drawer.at(1);
-//    }
-//
-//    _bottom.position.y -= p_count;
-//    _bottom.texCoords.y -= p_count * 2; // preserves texture coordinates
 }
 
 int VerticalLine::top()
@@ -140,14 +102,11 @@ void VerticalLine::clear() {
 }
 
 int VerticalLine::count() {
-    auto _top = &drawer.back();
-    auto _bottom = &drawer.front();
-
-    //return _bottom->position.y - _top->position.y;
-
-    return drawer.size();}
+    return drawer.size();
+}
 
 bool VerticalLine::contains_vertex_at(float position) {
+    if (count() == 0) return false;
     auto& _top = drawer.back();
     auto& _bottom = drawer.front();
 
@@ -157,10 +116,11 @@ bool VerticalLine::contains_vertex_at(float position) {
 }
 
 bool VerticalLine::is_between(float p_bottom, float p_top) {
+    if (drawer.size() == 0) return false;
     auto& _top = drawer.back();
     auto& _bottom = drawer.front();
 
-    if(_bottom.position.y < p_bottom && _top.position.y > p_top){
+    if(_bottom.position.y <= p_bottom && _top.position.y >= p_top){
         return true;
     }
     return false;
@@ -179,16 +139,26 @@ void VerticalLine::push(std::vector<sf::Vertex> vec) {
 }
 
 VerticalLine::VerticalLine(float new_bottom, VerticalLine *pLine) {
-    int begin = 0;
-    for(; begin < pLine->drawer.size(); begin++){
-        if(new_bottom < pLine->drawer.at(begin).position.y) continue;
-        begin--;
-        break;
-    }
-    for(; begin < pLine->drawer.size(); begin++){
-        drawer.emplace_back(pLine->drawer.at(begin));
-    }
-    pop_from_bottom(drawer.front().position.y - new_bottom);
+    auto vec = pLine->get_vector();
+    drawer = *vec;
+
+    //while (drawer.size() > 2 && drawer.at(1).position.y > new_bottom) {
+    //    int to_remove = (drawer.front().position.y - drawer.at(1).position.y) * -1;
+    //    drawer.erase(drawer.begin());
+    //}
+
+
+
+    //int begin = 0;
+    //for(; begin < pLine->drawer.size(); begin++){
+    //    if(new_bottom < pLine->drawer.at(begin).position.y) continue;
+    //    begin--;
+    //    break;
+    //}
+    //for(; begin < pLine->drawer.size(); begin++){
+    //    drawer.emplace_back(pLine->drawer.at(begin));
+    //}
+    pop_from_bottom(new_bottom);
 
     //std::cout << std::endl;
     for(auto& v : drawer){

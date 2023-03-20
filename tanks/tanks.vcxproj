@@ -28,26 +28,26 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
@@ -131,41 +131,53 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="BoundingVertexArray.cpp" />
+    <ClCompile Include="Class.cpp" />
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="GameResourceManager.cpp" />
-    <ClCompile Include="HorizontalVertexArray.cpp" />
     <ClCompile Include="HUD.cpp" />
+    <ClCompile Include="legacy_HorizontalVertexArray.cpp" />
+    <ClCompile Include="legacy_VerticalVertexArray.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Parser.cpp" />
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="Projectile.cpp" />
     <ClCompile Include="Random.cpp" />
-    <ClCompile Include="ObsoleteTerrain.cpp" />
-    <ClCompile Include="Terrain.cpp" />
-    <ClCompile Include="TerrainEngine.cpp" />
-    <ClCompile Include="VerticalVertexArray.cpp" />
+    <ClCompile Include="terrain\Chunk.cpp" />
+    <ClCompile Include="terrain\TerrainEngine.cpp" />
+    <ClCompile Include="terrain\VerticalLine.cpp" />
     <ClCompile Include="Weapon.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BoundingVertexArray.h" />
+    <ClInclude Include="Class.h" />
     <ClInclude Include="consts.h" />
     <ClInclude Include="Game.h" />
     <ClInclude Include="GameResourceManager.h" />
-    <ClInclude Include="HorizontalVertexArray.h" />
     <ClInclude Include="HUD.h" />
-    <ClInclude Include="MyVertexArray.h" />
+    <ClInclude Include="legacy_HorizontalVertexArray.h" />
+    <ClInclude Include="legacy_VerticalVertexArray.h" />
     <ClInclude Include="Parser.h" />
     <ClInclude Include="Player.h" />
     <ClInclude Include="Projectile.h" />
     <ClInclude Include="Random.h" />
-    <ClInclude Include="ObsoleteTerrain.h" />
-    <ClInclude Include="Terrain.h" />
-    <ClInclude Include="TerrainEngine.h" />
-    <ClInclude Include="VerticalVertexArray.h" />
+    <ClInclude Include="terrain\Chunk.h" />
+    <ClInclude Include="terrain\TerrainEngine.h" />
+    <ClInclude Include="terrain\VerticalLine.h" />
     <ClInclude Include="Weapon.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="todo.txt" />
+    <Text Include="weapons.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Font Include="ariali.ttf" />
+    <Font Include="assets\ariali.ttf" />
+    <Font Include="assets\Lato-Regular.ttf" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="assets\ground.jpg" />
+    <Image Include="assets\ground3.jpg" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

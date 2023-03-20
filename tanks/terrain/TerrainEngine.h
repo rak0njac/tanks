@@ -2,8 +2,8 @@
 #include <vector>
 #include <SFML/Graphics.hpp>
 #include <unordered_set>
-#include "BoundingVertexArray.h"
-#include "Random.h"
+#include "../BoundingVertexArray.h"
+#include "../Random.h"
 #include "Chunk.h"
 #include <iostream>
 

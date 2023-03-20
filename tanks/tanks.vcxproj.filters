@@ -27,9 +27,6 @@
     <ClCompile Include="Game.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="ObsoleteTerrain.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Random.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -51,24 +48,30 @@
     <ClCompile Include="Player.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Terrain.cpp">
+    <ClCompile Include="terrain\Chunk.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="TerrainEngine.cpp">
+    <ClCompile Include="terrain\TerrainEngine.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="VerticalVertexArray.cpp">
-      <Filter>Source Files\util</Filter>
+    <ClCompile Include="terrain\VerticalLine.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="HorizontalVertexArray.cpp">
+    <ClCompile Include="BoundingVertexArray.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Class.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="legacy_HorizontalVertexArray.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="legacy_VerticalVertexArray.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Game.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="ObsoleteTerrain.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Random.h">
@@ -92,29 +95,46 @@
     <ClInclude Include="Player.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Terrain.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="MyVertexArray.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="TerrainEngine.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="VerticalVertexArray.h">
-      <Filter>Header Files\util</Filter>
-    </ClInclude>
     <ClInclude Include="BoundingVertexArray.h">
       <Filter>Header Files\util</Filter>
     </ClInclude>
     <ClInclude Include="consts.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="HorizontalVertexArray.h">
-      <Filter>Header Files\util</Filter>
+    <ClInclude Include="terrain\Chunk.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="terrain\TerrainEngine.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="terrain\VerticalLine.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Class.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="legacy_HorizontalVertexArray.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="legacy_VerticalVertexArray.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Text Include="todo.txt" />
+    <Text Include="weapons.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Font Include="assets\ariali.ttf" />
+    <Font Include="assets\Lato-Regular.ttf" />
+    <Font Include="ariali.ttf" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="assets\ground.jpg">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="assets\ground3.jpg">
+      <Filter>Resource Files</Filter>
+    </Image>
   </ItemGroup>
 </Project>

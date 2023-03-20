@@ -1,6 +1,6 @@
 #pragma once
 #include <SFML/Graphics.hpp>
-#include "consts.h"
+#include "../consts.h"
 #include "VerticalLine.h"
 #include <iostream>
 
@@ -18,8 +18,9 @@ public:
     bool is_falling;
     void move(const int &num_pixels, Chunk &array, std::string direction = "down");
     void push(Chunk &array);
-
-private:
     std::vector<VerticalLine*> vec;
+    void set_color(sf::Color color);
+private:
+    
 
 };

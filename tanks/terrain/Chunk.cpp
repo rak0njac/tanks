@@ -98,3 +98,12 @@ void Chunk::push(Chunk &array) {
 //        }
 //    }
 }
+
+void Chunk::set_color(sf::Color color) {
+    for (int i = 0; i < vec.size(); i++) {
+        if (vec.at(i) != nullptr && vec.at(i)->count() > 0) {
+
+            vec.at(i)->set_color(sf::Color::Red);
+        }
+    }
+}

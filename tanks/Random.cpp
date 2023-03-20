@@ -10,7 +10,7 @@ namespace rnd {
 	}
 
 	int get_int(int x, int y) {
-        std::uniform_int_distribution<std::mt19937::result_type> dist(x,y);
+        std::uniform_int_distribution<int> dist(x,y);
         return dist(rng);
 	}
 

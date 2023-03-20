@@ -2,7 +2,7 @@
 #include <vector>
 #include <SFML/Graphics.hpp>
 #include <array>
-#include "consts.h"
+#include "../consts.h"
 #include "deque"
 
 class VerticalLine: public sf::Drawable{

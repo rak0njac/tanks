@@ -1,4 +1,4 @@
-#include <BoundingVertexArray.h>
+#include "BoundingVertexArray.h"
 
 BoundingVertexArray::BoundingVertexArray() {
 

@@ -31,15 +31,36 @@ void TerrainEngine::draw(sf::RenderTarget & target, sf::RenderStates states) con
 {
 	states.texture = &texture;
 
+
     if(const_optimized_for == "GPU"){
         target.draw(va, states);
     }
     else{
         main_terrain.draw(target, states);
-        for(auto& t : falling_terrains)
+        for (auto t : falling_terrains) {
+            //t.set_color(sf::Color::Red);
             t.draw(target, states);
+            //for (auto& v : t.vec) {
+            //    if (v != nullptr) {
+            //        auto vec = v->get_vector();
+            //        for (auto& vertex : *vec) {
+            //            sf::CircleShape circle(1, 5);
+            //            circle.setPosition(vertex.position);
+            //            target.draw(circle, states);
+            //        }
+            //    }
+            //}
+        }
         target.draw(debug_boundaries);
     }
+    //for (auto& v : main_terrain.vec) {
+    //    auto vec = v->get_vector();
+    //    for (auto& vertex : *vec) {
+    //        sf::CircleShape circle(1, 5);
+    //        circle.setPosition(vertex.position);
+    //        target.draw(circle, states);
+    //    }
+    //}
 }
 
 TerrainEngine::TerrainEngine(const std::string& texture_filename)
@@ -112,35 +133,35 @@ void TerrainEngine::destroy_circle(sf::Vector2i pos_projectile, int radius) {
 
     //std::cout << falling_terrains.size() << std::endl;
 
-    for(int i = 0; i < const_screen_width; i++){
-        for(int j = 0; j < falling_terrains.size(); j++){
-//            std::cout << std::endl;
-//            std::cout << "************** REPORT :: terrain chunk at index " << j << std::endl;
-//            std::cout << std::endl;
-//            if(falling_terrains.at(j).at(i) == nullptr){
-//                std::cout << "************** REPORT :: x position " << i << " is nullptr" << std::endl;
-//            }
-//            else{
-//                for(auto& v : *falling_terrains.at(j).at(i)->get_vector()){
-//                    std::cout << "************** REPORT :: vertex x position: " << v.position.x << std::endl;
-//                    std::cout << "************** REPORT :: vertex y position: " << v.position.y << std::endl;
-//                }
-//            }
-        }
+    //for(int i = 0; i < const_screen_width; i++){
+    //    for(int j = 0; j < falling_terrains.size(); j++){
+    //        std::cout << std::endl;
+    //        std::cout << "************** REPORT :: terrain chunk at index " << j << std::endl;
+    //        std::cout << std::endl;
+    //        if(falling_terrains.at(j).at(i) == nullptr){
+    //            std::cout << "************** REPORT :: x position " << i << " is nullptr" << std::endl;
+    //        }
+    //        else{
+    //            for(auto& v : *falling_terrains.at(j).at(i)->get_vector()){
+    //                std::cout << "************** REPORT :: vertex x position: " << v.position.x << std::endl;
+    //                std::cout << "************** REPORT :: vertex y position: " << v.position.y << std::endl;
+    //            }
+    //        }
+    //    }
 
-        //std::cout << std::endl;
-        //std::cout << "************** REPORT :: main terrain" << std::endl;
-        //std::cout << std::endl;
-        if(main_terrain.at(i) == nullptr){
-            //std::cout << "************** REPORT :: x position " << i << " is nullptr" << std::endl;
-        }
-        else{
-            for(auto& v : *main_terrain.at(i)->get_vector()){
-                //std::cout << "************** REPORT :: vertex x position: " << v.position.x << std::endl;
-                //std::cout << "************** REPORT :: vertex y position: " << v.position.y << std::endl;
-            }
-        }
-    }
+    //    std::cout << std::endl;
+    //    //std::cout << "************** REPORT :: main terrain" << std::endl;
+    //    //std::cout << std::endl;
+    //    //if(main_terrain.at(i) == nullptr){
+    //    //    std::cout << "************** REPORT :: x position " << i << " is nullptr" << std::endl;
+    //    //}
+    //    //else{
+    //    //    for(auto& v : *main_terrain.at(i)->get_vector()){
+    //    //        std::cout << "************** REPORT :: vertex x position: " << v.position.x << std::endl;
+    //    //        std::cout << "************** REPORT :: vertex y position: " << v.position.y << std::endl;
+    //    //    }
+    //    //}
+    //}
 }
 
 //TODO clean this shit!!! learn about inline functions
@@ -150,7 +171,7 @@ void TerrainEngine::destroy_circle(sf::Vector2f& pos_lower, sf::Vector2f& pos_up
         if(vva->contains_vertex_at(pos_upper.y)){
             VerticalLine* new_vva_upper = new VerticalLine(pos_upper.y, vva);
 
-            if(1){//new_vva_upper->count() > 0){
+            if(new_vva_upper->count() > 0){
                 new_terrain_chunk_upper.push(pos_upper.x, new_vva_upper);
                 if(vva->contains_vertex_at(pos_lower.y)){
                     vva->pop(pos_lower.y - vva->top());
@@ -219,7 +240,7 @@ void TerrainEngine::randomize(int roughness) {
         for(int j = 0; j < (x2 - x1); j++){
             y1 += step;
             sf::Vector2f ver(x1 + j, y1);
-            hva.push(x1 + j, new VerticalLine(x1 + j, const_screen_height, y1));
+            hva.push(x1 + j, new VerticalLine(x1 + j, const_screen_height - 5, y1));
         }
     }
     main_terrain = hva;
